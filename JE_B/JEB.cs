@@ -598,7 +598,7 @@ namespace Imported_commands
 
 
                 compilerParameters.ReferencedAssemblies.Add(assemblyPathD);
-                compilerParameters.ReferencedAssemblies.Add(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\PresentationFramework.dll");
+                //compilerParameters.ReferencedAssemblies.Add(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\PresentationFramework.dll");
                 return codeProvider.CompileAssemblyFromSource(compilerParameters, code);
 
             }
@@ -715,7 +715,7 @@ namespace Imported_commands
 
 
                 compilerParameters.ReferencedAssemblies.Add(assemblyPathD);
-                compilerParameters.ReferencedAssemblies.Add(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\PresentationFramework.dll");
+                //compilerParameters.ReferencedAssemblies.Add(@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\PresentationFramework.dll");
                 return codeProvider.CompileAssemblyFromSource(compilerParameters, code);
 
             }
