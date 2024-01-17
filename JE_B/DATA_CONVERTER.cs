@@ -43,6 +43,15 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
+        public Data Copy()
+        {
+            Data d = new Data();
+            d.strings = strings;
+            d.doubles = doubles;
+            d.integers = integers;
+            d.custom_types = custom_types;
+            return d;
+        }
         public void SaveToFile(string filePath)
         {
             string stringsData = DictionaryToString(strings);

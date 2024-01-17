@@ -183,8 +183,9 @@ namespace jumpE_basic
         public string taken_in_string;
         public List<int> positions = new List<int>();
         SimpleTokenizer ourstuff = new SimpleTokenizer();
-        CommandRegistry commandRegistry = new CommandRegistry();
+        public CommandRegistry commandRegistry = new CommandRegistry();
         DATA_CONVERTER.Data data;
+        public List<DATA_CONVERTER.Data> datas = new List<Data>();
         DATA_CONVERTER.command_centralls interorouter = new DATA_CONVERTER.command_centralls();
         public int position;
         public bool run;
@@ -196,7 +197,7 @@ namespace jumpE_basic
             this.lines = ourstuff.Linizer(this.taken_in_string);
             this.position = 0;
             this.run = true;
-            this.data = data;
+            datas.Add(data);
             data.setI("LNT", 0);
 
             while (this.run)
@@ -210,11 +211,11 @@ namespace jumpE_basic
                     interorouter = commandRegistry.GetCommandDefinition(this.code[0]);
                     if (interorouter is command_centrall)
                     {
-                        ((command_centrall)(interorouter)).Execute(this.code, data, this);
+                        ((command_centrall)(interorouter)).Execute(this.code, datas[datas.Count()-1], this);
                     }
                     if (interorouter is outer_commands)
                     {
-                        ((outer_commands)(interorouter)).Execute(this.code, data);
+                        ((outer_commands)(interorouter)).Execute(this.code, datas[datas.Count() - 1]);
                     }
 
                 }
@@ -308,6 +309,9 @@ namespace jumpE_basic
                 //subtract subtract = new subtract();
                 //multiply multiply = new multiply();
                 //divide divide = new divide();
+                raise raise = new raise();
+                push push = new push();
+                pop pop = new pop();
                 jump jump = new jump();//jumps to a line number or calls a function use "JP >> {function name}" to call a function
                 inputD inputD = new inputD();//takes a double input and stores it in a variable, variable must allready be initalized
                 comment comment = new comment();// used to comment out lines of code, can be used with // or #
@@ -342,6 +346,7 @@ namespace jumpE_basic
                 commands.Add("use", use);
                 commands.Add("line_number", line_number); commands.Add("ln", line_number); commands.Add("LN", line_number);
                 commands.Add("comment", comment); commands.Add("//", comment); commands.Add("#", comment);
+                commands.Add("raise", raise); commands.Add("push", push); commands.Add("pop", pop);
             }
             public void add_command(string name, command_centralls type)
             {
@@ -431,6 +436,35 @@ namespace jumpE_basic
 
             }
         }
+        public class raise : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                Base.datas.Add(D.Copy());
+            }
+        }
+        public class push : command_centrall
+        {
+            pre_defined_variable f = new pre_defined_variable();
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.inint(code[1])) { Base.datas[Base.datas.Count - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.indouble(code[1])) { Base.datas[Base.datas.Count - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.instring(code[1])) { Base.datas[Base.datas.Count - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
+                }
+                //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
+                
+            }
+        }
+        public class pop : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                Base.datas.RemoveAt(Base.datas.Count - 1);
+            }
+        }
         public class when : command_centrall
         {
             pre_defined_variable Math_equation;
@@ -506,6 +540,10 @@ namespace jumpE_basic
                             }
                             q++;
                         }
+                    }
+                    else
+                    {
+                        
                     }
 
                 }
