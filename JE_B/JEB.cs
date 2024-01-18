@@ -506,8 +506,12 @@ namespace jumpE_basic
                 }
                 else if (D.instring(code[1])) { Base.datas[Base.datas.Count - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
                 }
+                else if (D.issheet(code[1]))
+                {
+                    Base.datas[Base.datas.Count - 2].setsheet(code[1], D.referenceSheet(code[1]));
+                }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
-                
+
             }
         }
         public class pop : command_centrall
@@ -986,7 +990,10 @@ namespace Imported_commands
                         }
                         CalculationEngine engine = new CalculationEngine();
                         D.setI(code[1], (int)(engine.Calculate(equation, drict)));
-                        this.commands.add_command(code[1], this.Math_equation);
+                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        {
+                            Base.commandRegistry.add_command(code[1], this.Math_equation);
+                        }
 
                     }
 
@@ -1362,7 +1369,11 @@ namespace Imported_commands
                             }
                         }
                         D.setS(code[1], mesage);
-                        this.commands.add_command(code[1], this.varlee);
+                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        {
+                            Base.commandRegistry.add_command(code[1], this.varlee);
+                        }
+                        
 
                     }
                 }
@@ -1413,7 +1424,11 @@ namespace Imported_commands
                         }
                         CalculationEngine engine = new CalculationEngine();
                         D.setD(code[1], (engine.Calculate(equation, drict)));
-                        this.commands.add_command(code[1], this.Math_equation);
+                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        {
+                            Base.commandRegistry.add_command(code[1], this.Math_equation);
+                        }
+                        
                     }
 
                 }
