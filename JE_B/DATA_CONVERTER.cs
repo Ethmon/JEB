@@ -31,6 +31,7 @@ namespace DATA_CONVERTER
         Dictionary<string, string> strings = new Dictionary<string, string>();
         Dictionary<string, double> doubles = new Dictionary<string, double>();
         Dictionary<string, int> integers = new Dictionary<string, int>();
+        Dictionary<string, Data> sheets = new Dictionary<string, Data>();
         Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
         public string referenceS(string key)
         {
@@ -46,10 +47,14 @@ namespace DATA_CONVERTER
         public Data Copy()
         {
             Data d = new Data();
-            d.strings = strings;
-            d.doubles = doubles;
-            d.integers = integers;
-            d.custom_types = custom_types;
+            d.strings = new Dictionary<string, string>(strings);
+            d.doubles = new Dictionary<string, double>(doubles);
+            d.integers = new Dictionary<string, int>(integers);
+            d.custom_types = new Dictionary<string, Dictionary<string,object>>(custom_types);
+            foreach(string key in sheets.Keys)
+            {
+                d.sheets.Add(key, sheets[key].Copy());
+            }
             return d;
         }
         public void SaveToFile(string filePath)
@@ -80,6 +85,35 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
+        public Object referenceCustom(string key, string key2)
+        {
+            if (custom_types.ContainsKey(key))
+            {
+                if (custom_types[key].ContainsKey(key2))
+                {
+                    return custom_types[key][key2];
+                }
+                else
+                {
+                    throw new ArgumentException(key2 + " not initiallized");
+                }
+            }
+            else
+            {
+                throw new ArgumentException(key + " not initiallized");
+            }
+        }
+        public Data referenceSheet(string key)
+        {
+            if (sheets.ContainsKey(key))
+            {
+                return sheets[key];
+            }
+            else
+            {
+                throw new ArgumentException(key + " not initiallized");
+            }
+        }
         public bool isnumvar(string key)
         {
             if (doubles.ContainsKey(key) || integers.ContainsKey(key))
@@ -90,7 +124,7 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key))
             {
                 return true;
             }
@@ -131,6 +165,14 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
+        public bool issheet(string key)
+        {
+            if (sheets.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
         public Object referenceVar(string key)
         {
             if (doubles.ContainsKey(key))
@@ -145,6 +187,14 @@ namespace DATA_CONVERTER
             {
                 return integers[key];
             }
+            else if (sheets.ContainsKey(key))
+            {
+                return sheets[key];
+            }
+            else if (custom_types.ContainsKey(key))
+            {
+                return custom_types[key];
+            }
             else
             {
                 throw new ArgumentException(key + " not initiallized");
@@ -153,7 +203,7 @@ namespace DATA_CONVERTER
         }
         public void setS(string key, string data)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -176,7 +226,7 @@ namespace DATA_CONVERTER
 
         public void setD(string key, double data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key))
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -196,9 +246,54 @@ namespace DATA_CONVERTER
                 }
             }
         }
+        public void setCustom(string key, Dictionary<string, Object> data)
+        {
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || doubles.ContainsKey(key))
+            {
+                Console.WriteLine("variable set to other type");
+            }
+            else
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (custom_types.ContainsKey(key))
+                    {
+                        custom_types.Remove(key);
+                    }
+                    custom_types.Add(key, data);
+                }
+            }
+        }
+
+        public void setsheet(string key, Data data)
+        {
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || doubles.ContainsKey(key) || custom_types.ContainsKey(key))
+            {
+                Console.WriteLine("variable set to other type");
+            }
+            else
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (sheets.ContainsKey(key))
+                    {
+                        sheets.Remove(key);
+                    }
+                    sheets.Add(key, data);
+                }
+            }
+        }
         public void setI(string key, int data)
         {
-            if (strings.ContainsKey(key) || doubles.ContainsKey(key))
+            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }

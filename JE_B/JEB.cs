@@ -13,6 +13,7 @@ using System.Reflection;
 using Microsoft.CSharp;
 using Jace;
 using System.CodeDom.Compiler;
+using System.Security.Policy;
 namespace jumpE_basic
 {
     class jumpE_basic
@@ -202,6 +203,7 @@ namespace jumpE_basic
 
             while (this.run)
             {
+
                 this.code = ourstuff.Tokenizer(this.lines[this.position]);//get all commands in the line.
                 data.setI("LNC", this.position);// set line number for use as a variable in the code
                 data.setI("LNT", data.referenceI("LNT") + 1);//total amount of lines that have been run per session of the data converter
@@ -236,6 +238,7 @@ namespace jumpE_basic
                 {
                     this.position = 0;
                 }
+
 
 
 
@@ -347,6 +350,7 @@ namespace jumpE_basic
                 commands.Add("line_number", line_number); commands.Add("ln", line_number); commands.Add("LN", line_number);
                 commands.Add("comment", comment); commands.Add("//", comment); commands.Add("#", comment);
                 commands.Add("raise", raise); commands.Add("push", push); commands.Add("pop", pop);
+                commands.Add("sideLayer", new sideLayer());commands.Add("remL", new remL());commands.Add("callLayer", new callLayer());commands.Add("bring", new bring());
             }
             public void add_command(string name, command_centralls type)
             {
@@ -441,6 +445,54 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 Base.datas.Add(D.Copy());
+            }
+        }
+        public class sideLayer : command_centrall
+        {             
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                Data data = new Data();
+                Base.datas.Add(data);
+                D.setsheet(code[1], data);
+            }
+        }
+        public class remL : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                D.setsheet(code[1],D);
+            }
+        }
+        public class  callLayer : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.issheet(code[1]))
+                {
+                    Base.datas.Add(D.referenceSheet(code[1]));
+                }
+            }
+        }
+        public class bring : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (Base.datas[Base.datas.Count - 2].inint(code[1]))
+                {
+                    D.setI(code[1], D.referenceI(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].indouble(code[1]))
+                {
+                    D.setD(code[1], D.referenceD(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].instring(code[1]))
+                {
+                    D.setS(code[1], D.referenceS(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
+                {
+                    D.setsheet(code[1], D.referenceSheet(code[1]));
+                }
             }
         }
         public class push : command_centrall
@@ -1375,6 +1427,9 @@ namespace Imported_commands
         {
             public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
             {
+                DATA_CONVERTER.Data DD = Base.datas[0];
+                Base.datas.Clear();
+                Base.datas.Add(DD);
                 Base.STOP();
             }
         }
