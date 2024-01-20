@@ -262,7 +262,7 @@ namespace jumpE_basic
             public List<string> Linizer(string input)
             {
                 List<string> words = new List<string>();
-                string[] lines = input.Split(new char[] { '\n', ';' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = input.Split(new char[] { '\n', ';','\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in lines)
                 {
@@ -274,7 +274,7 @@ namespace jumpE_basic
             public List<string> Tokenizer(string input)
             {
                 List<string> words = new List<string>();
-                string[] tokens = input.Split(new char[] { ' ', '\t', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] tokens = input.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in tokens)
                 {
@@ -312,9 +312,11 @@ namespace jumpE_basic
                 //subtract subtract = new subtract();
                 //multiply multiply = new multiply();
                 //divide divide = new divide();
+                sideLayer sideLayer = new sideLayer();
                 raise raise = new raise();
                 push push = new push();
                 pop pop = new pop();
+                callLayer callLy = new callLayer();
                 jump jump = new jump();//jumps to a line number or calls a function use "JP >> {function name}" to call a function
                 inputD inputD = new inputD();//takes a double input and stores it in a variable, variable must allready be initalized
                 comment comment = new comment();// used to comment out lines of code, can be used with // or #
@@ -350,7 +352,7 @@ namespace jumpE_basic
                 commands.Add("line_number", line_number); commands.Add("ln", line_number); commands.Add("LN", line_number);
                 commands.Add("comment", comment); commands.Add("//", comment); commands.Add("#", comment);
                 commands.Add("raise", raise); commands.Add("push", push); commands.Add("pop", pop);
-                commands.Add("sideLayer", new sideLayer());commands.Add("remL", new remL());commands.Add("callLayer", new callLayer());commands.Add("bring", new bring());
+                commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
             }
             public void add_command(string name, command_centralls type)
             {
@@ -403,7 +405,7 @@ namespace jumpE_basic
 
                     for (int i = 1; i < code.Count; i++)
                     {
-                        if (code[i] == "\\Clear ")
+                        if (code[i] == "\\Clear")
                         {
                             Console.Clear();
                         }
@@ -452,25 +454,50 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 Data data = new Data();
+                
+                if (code[1] == "\"" && code[2] == "\"")
+                {
+                    D.setsheet(D.referenceS(code[2])+"#", data);
+                }
+                else
+                {
+                    D.setsheet(code[1], data);
+                }
                 Base.datas.Add(data);
-                D.setsheet(code[1], data);
+
             }
         }
         public class remL : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                D.setsheet(code[1],D);
+                if (code[1] == "\"" && code[2] == "\"")
+                {
+                    D.setsheet(D.referenceS(code[2]) + "#", D);
+                }
+                else
+                {
+                    D.setsheet(code[1], D);
+                }
             }
         }
         public class  callLayer : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (D.issheet(code[1]))
+                if (code[1] == "\"" && code[2] == "\"")
+                {
+                    Base.datas.Add(D.referenceSheet(D.referenceS(code[2])+ "#"));
+                }
+                else if (D.issheet(code[1]))
                 {
                     Base.datas.Add(D.referenceSheet(code[1]));
                 }
+                else
+                {
+                    
+                }
+                //Console.WriteLine(D.sheets);
             }
         }
         public class bring : command_centrall
@@ -497,18 +524,18 @@ namespace jumpE_basic
         }
         public class push : command_centrall
         {
-            pre_defined_variable f = new pre_defined_variable();
+            //pre_defined_variable f = new pre_defined_variable();
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (D.inint(code[1])) { Base.datas[Base.datas.Count - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                if (D.inint(code[1])) { Base.datas[Base.datas.Count() - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
                 }
-                else if (D.indouble(code[1])) { Base.datas[Base.datas.Count - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                else if (D.indouble(code[1])) { Base.datas[Base.datas.Count() - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
                 }
-                else if (D.instring(code[1])) { Base.datas[Base.datas.Count - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
+                else if (D.instring(code[1])) { Base.datas[Base.datas.Count() - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
                 }
                 else if (D.issheet(code[1]))
                 {
-                    Base.datas[Base.datas.Count - 2].setsheet(code[1], D.referenceSheet(code[1]));
+                    Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1]));
                 }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
 
@@ -1474,16 +1501,22 @@ namespace Imported_commands
                     }
                     else if (code[1] == ">>")
                     {
+                        
                         foreach (string i in Base.lines)
                         {
-                            if (i == ">> " + code[2])
+                            //Console.WriteLine(i);Console.WriteLine(">> " + code[2]);
+                            if (i==">> " + code[2])
                             {
+                                
                                 D.setI(code[2], Base.get_position());
                                 Base.positions.Add(Base.get_position());
                                 Base.changePosition(Base.lines.IndexOf(i));
+                                break;
+
                             }
                         }
                     }
+                    
                 }
                 catch (Exception e)
                 {
