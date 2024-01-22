@@ -442,6 +442,34 @@ namespace jumpE_basic
 
             }
         }
+        public class IDD : command_centrall
+        {
+            public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
+            {
+                if (code[1] == "\"")
+                {
+                    ;D.identifier = D.referenceI(code[2]);
+                }
+                else
+                {
+                    D.identifier = int.Parse(code[1]);
+                }
+            }
+        }
+        public class IDT : command_centrall
+        {
+            public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
+            {
+                if (code[1] == "\"")
+                {
+                    D.typeidentifier = D.referenceI(code[2]);
+                }
+                else
+                {
+                    D.typeidentifier = int.Parse(code[1]);
+                }
+            }
+        }
         public class raise : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -564,6 +592,7 @@ namespace jumpE_basic
 
                 try
                 {
+                    Boolean result = false;
                     string equation = "";
                     /*if (code.Count() == 2)
                     {
@@ -572,31 +601,81 @@ namespace jumpE_basic
 
                     }*/ // this will be for booleans when i get around to 
                         //else { }
-                    for (int i = 1; i < code.Count(); i++)
+                    if (code[1] == "typ")
                     {
-                        double j;
-                        if (Double.TryParse(code[i], out j))
+                        int a = 0;
+                        int b = -1;
+                        if (D.inint(code[2]))
                         {
-                            equation += j + " ";
+                            a = D.referenceI(code[2]);
                         }
-                        else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                        code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " " || code[i] == "==" || code[i] == "!=" || code[i] == ">" || code[i] == "<" ||
-                        code[i] == "=>" || code[i] == "=<" || code[i] == "!")
+                        else if (D.issheet(code[2]))
                         {
-                            equation += code[i] + " ";
+                            a = D.referenceSheet(code[2]).typeidentifier;
                         }
-                        else if (D.isnumvar(code[i]))
+                        else if (D.instring(code[2]))
                         {
-                            equation += D.referenceVar(code[i]) + " ";
+                            if (D.issheet(D.referenceS(code[2])+"#"))
+                            {
+                                a = D.referenceSheet(D.referenceS(code[2])+"#").typeidentifier;
+                            }
                         }
-                        else
+                        else if (int.TryParse(code[2],out int ad))
                         {
-                            equation += code[i] + " ";
-                            Debug.WriteLine("not recognized when statement");
+                            a = ad;
+                        }
+                        if (D.inint(code[3]))
+                        {
+                            b = D.referenceI(code[3]);
+                        }
+                        else if (D.issheet(code[3]))
+                        {
+                            b = D.referenceSheet(code[3]).typeidentifier;
+                        }
+                        else if (D.instring(code[3]))
+                        {
+                            if (D.issheet(D.referenceS(code[3]) + "#"))
+                            {
+                                b = D.referenceSheet(D.referenceS(code[3]) + "#").typeidentifier;
+                            }
+                        }
+                        else if (int.TryParse(code[2], out int bd))
+                        {
+                            b= bd;
+                        }
+                        if(b == a)
+                        {
+                            result = true;
                         }
                     }
-                    CalculationEngine engine = new CalculationEngine();
-                    bool result = Convert.ToBoolean(engine.Calculate(equation));
+                    else
+                    {
+                        for (int i = 1; i < code.Count(); i++)
+                        {
+                            double j;
+                            if (Double.TryParse(code[i], out j))
+                            {
+                                equation += j + " ";
+                            }
+                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
+                            code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " " || code[i] == "==" || code[i] == "!=" || code[i] == ">" || code[i] == "<" ||
+                            code[i] == "=>" || code[i] == "=<" || code[i] == "!")
+                            {
+                                equation += code[i] + " ";
+                            }
+                            else if (D.isnumvar(code[i]))
+                            {
+                                equation += D.referenceVar(code[i]) + " ";
+                            }
+                            else
+                            {
+                                equation += code[i] + " ";
+                                Debug.WriteLine("not recognized when statement");
+                            }
+                        }
+                        CalculationEngine engine = new CalculationEngine();
+                        result = Convert.ToBoolean(engine.Calculate(equation));
+                    }
                     if (!result)
                     {
                         int w = 0;

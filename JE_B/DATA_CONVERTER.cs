@@ -33,6 +33,8 @@ namespace DATA_CONVERTER
         Dictionary<string, int> integers = new Dictionary<string, int>();
         public Dictionary<string, Data> sheets = new Dictionary<string, Data>();
         Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
+        public int identifier = 0;
+        public int typeidentifier = 0;
         public string referenceS(string key)
         {
             if (strings.ContainsKey(key))
