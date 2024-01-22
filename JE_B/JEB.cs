@@ -738,10 +738,6 @@ namespace jumpE_basic
                     string generatedCode = $@"
 using DATA_CONVERTER;
 using System;
-using Jace.Execution;
-using Jace.Operations;
-using Jace.Tokenizer;
-using Jace.Util;
 using Jace;
 using System.Linq;
 using System.Text;
@@ -831,10 +827,6 @@ using System;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Jace.Execution;
-using Jace.Operations;
-using Jace.Tokenizer;
-using Jace.Util;
 using Jace;
 using System.Windows;
 using System.Collections.Generic;
