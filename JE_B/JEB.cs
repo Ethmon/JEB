@@ -203,8 +203,11 @@ namespace jumpE_basic
 
             while (this.run)
             {
-
-                this.code = ourstuff.Tokenizer(this.lines[this.position]);//get all commands in the line.
+                //try
+                {
+                    this.code = ourstuff.Tokenizer(this.lines[this.position]);//get all commands in the line.
+                }
+                //catch { Console.WriteLine("Error: 2, Line not recognized"); }
                 data.setI("LNC", this.position);// set line number for use as a variable in the code
                 data.setI("LNT", data.referenceI("LNT") + 1);//total amount of lines that have been run per session of the data converter
                 if (commandRegistry.ContainsCommand(this.code[0]))
@@ -223,7 +226,7 @@ namespace jumpE_basic
                 }
                 else
                 {
-                    //Console.WriteLine("Unknown command: " + this.code[0]);
+                    //Console.WriteLine("Error: 1, command not recognized, Line " + position);
                 }
                 if (this.run == false)
                 {
@@ -298,7 +301,7 @@ namespace jumpE_basic
         }
         public class CommandRegistry
         {
-            Dictionary<string, DATA_CONVERTER.command_centralls> commands = new Dictionary<string, DATA_CONVERTER.command_centralls>();
+            public Dictionary<string, DATA_CONVERTER.command_centralls> commands = new Dictionary<string, DATA_CONVERTER.command_centralls>();
             public CommandRegistry()
             {
                 print print = new print();//prints to console, can use variables and strings by putting them in quotes(must be seperated by spaces)
@@ -352,10 +355,16 @@ namespace jumpE_basic
                 commands.Add("line_number", line_number); commands.Add("ln", line_number); commands.Add("LN", line_number);
                 commands.Add("comment", comment); commands.Add("//", comment); commands.Add("#", comment);
                 commands.Add("raise", raise); commands.Add("push", push); commands.Add("pop", pop);
+                commands.Add("IDD", new IDD()); commands.Add("IDT", new IDT());
+                commands.Add("free", new free());
                 commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
             }
             public void add_command(string name, command_centralls type)
             {
+                if (commands.ContainsKey(name))
+                {
+                    commands.Remove(name);
+                }
                 commands.Add(name, type);
             }
             public bool ContainsCommand(string command)
@@ -433,9 +442,9 @@ namespace jumpE_basic
                     }
                     Console.WriteLine(Message);
                 }
-                catch (Exception e)
+                catch
                 {
-                    Console.WriteLine(e + " Line: " + Base.get_position());
+                    Console.WriteLine("Error: printing error, Line "+Base.position);
                 }
 
 
@@ -448,7 +457,7 @@ namespace jumpE_basic
             {
                 if (code[1] == "\"")
                 {
-                    ;D.identifier = D.referenceI(code[2]);
+                    D.identifier = D.referenceI(code[2]);
                 }
                 else
                 {
@@ -470,28 +479,46 @@ namespace jumpE_basic
                 }
             }
         }
+        public class free : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                //try
+                    if (Base.commandRegistry.ContainsCommand(code[1]))
+                    {
+                        Base.commandRegistry.commands.Remove(code[1]);
+                        D.remove(code[1]);
+                    }
+                //} catch { Console.WriteLine("Error: 4, Unable to Free, Line"+Base.position); }
+            }
+        }
         public class raise : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 Base.datas.Add(D.Copy());
+                
             }
         }
         public class sideLayer : command_centrall
         {             
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                Data data = new Data();
-                
-                if (code[1] == "\"" && code[2] == "\"")
+                //try
                 {
-                    D.setsheet(D.referenceS(code[2])+"#", data);
+                    Data data = new Data();
+
+                    if (code[1] == "\"" && code[3] == "\"")
+                    {
+                        D.setsheet(D.referenceS(code[2]) + "#", data);
+                    }
+                    else
+                    {
+                        D.setsheet(code[1], data);
+                    }
+                    Base.datas.Add(data);
                 }
-                else
-                {
-                    D.setsheet(code[1], data);
-                }
-                Base.datas.Add(data);
+                //catch { Console.WriteLine("Error: 5, Sheet error, Line "+Base.position); }
 
             }
         }
@@ -499,7 +526,7 @@ namespace jumpE_basic
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (code[1] == "\"" && code[2] == "\"")
+                if (code[1] == "\"" && code[3] == "\"")
                 {
                     D.setsheet(D.referenceS(code[2]) + "#", D);
                 }
@@ -513,7 +540,7 @@ namespace jumpE_basic
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (code[1] == "\"" && code[2] == "\"")
+                if (code[1] == "\"" && code[3] == "\"")
                 {
                     Base.datas.Add(D.referenceSheet(D.referenceS(code[2])+ "#"));
                 }
@@ -523,7 +550,7 @@ namespace jumpE_basic
                 }
                 else
                 {
-                    
+                    //Console.WriteLine("Error: 6, Sheet unable to be called, Line "+Base.position);
                 }
                 //Console.WriteLine(D.sheets);
             }
@@ -534,20 +561,21 @@ namespace jumpE_basic
             {
                 if (Base.datas[Base.datas.Count - 2].inint(code[1]))
                 {
-                    D.setI(code[1], D.referenceI(code[1]));
+                    D.setI(code[1], Base.datas[Base.datas.Count - 2].referenceI(code[1]));
                 }
                 else if (Base.datas[Base.datas.Count - 2].indouble(code[1]))
                 {
-                    D.setD(code[1], D.referenceD(code[1]));
+                    D.setD(code[1], Base.datas[Base.datas.Count - 2].referenceD(code[1]));
                 }
                 else if (Base.datas[Base.datas.Count - 2].instring(code[1]))
                 {
-                    D.setS(code[1], D.referenceS(code[1]));
+                    D.setS(code[1], Base.datas[Base.datas.Count - 2].referenceS(code[1]));
                 }
                 else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
                 {
-                    D.setsheet(code[1], D.referenceSheet(code[1]));
+                    D.setsheet(code[1], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
                 }
+                //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
         public class push : command_centrall
@@ -565,6 +593,7 @@ namespace jumpE_basic
                 {
                     Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1]));
                 }
+                //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
 
             }
@@ -573,7 +602,11 @@ namespace jumpE_basic
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                Base.datas.RemoveAt(Base.datas.Count - 1);
+                //try
+                {
+                    Base.datas.RemoveAt(Base.datas.Count - 1);
+                }
+                //catch { Console.WriteLine("Error: 9, pop overflux, Line " + Base.position); }
             }
         }
         public class when : command_centrall
@@ -590,7 +623,7 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
 
-                try
+                //try
                 {
                     Boolean result = false;
                     string equation = "";
@@ -639,7 +672,7 @@ namespace jumpE_basic
                                 b = D.referenceSheet(D.referenceS(code[3]) + "#").typeidentifier;
                             }
                         }
-                        else if (int.TryParse(code[2], out int bd))
+                        else if (int.TryParse(code[3], out int bd))
                         {
                             b= bd;
                         }
@@ -648,6 +681,54 @@ namespace jumpE_basic
                             result = true;
                         }
                     }
+                    else if (code[1] == "ver")
+                    {
+                        int a = 0;
+                        int b = -1;
+                        if (D.inint(code[2]))
+                        {
+                            a = D.referenceI(code[2]);
+                        }
+                        else if (D.issheet(code[2]))
+                        {
+                            a = D.referenceSheet(code[2]).identifier;
+                        }
+                        else if (D.instring(code[2]))
+                        {
+                            if (D.issheet(D.referenceS(code[2]) + "#"))
+                            {
+                                a = D.referenceSheet(D.referenceS(code[2]) + "#").identifier;
+                            }
+                        }
+                        else if (int.TryParse(code[2], out int ad))
+                        {
+                            a = ad;
+                        }
+                        if (D.inint(code[3]))
+                        {
+                            b = D.referenceI(code[3]);
+                        }
+                        else if (D.issheet(code[3]))
+                        {
+                            b = D.referenceSheet(code[3]).identifier;
+                        }
+                        else if (D.instring(code[3]))
+                        {
+                            if (D.issheet(D.referenceS(code[3]) + "#"))
+                            {
+                                b = D.referenceSheet(D.referenceS(code[3]) + "#").identifier;
+                            }
+                        }
+                        else if (int.TryParse(code[3], out int bd))
+                        {
+                            b = bd;
+                        }
+                        if (b == a)
+                        {
+                            result = true;
+                        }
+                    }
+
                     else
                     {
                         for (int i = 1; i < code.Count(); i++)
@@ -709,10 +790,10 @@ namespace jumpE_basic
                     }
 
                 }
-                catch (Exception e)
+                /*catch
                 {
-                    Console.WriteLine("Initialization error " + e);
-                }
+                    Console.WriteLine("Error: 10, logic statement error, Line "+ Base.position);
+                }*/
             }
         }
 
@@ -1579,7 +1660,7 @@ namespace Imported_commands
                             if (i==">> " + code[2])
                             {
                                 
-                                D.setI(code[2], Base.get_position());
+                                //D.setI(code[2], Base.get_position());
                                 Base.positions.Add(Base.get_position());
                                 Base.changePosition(Base.lines.IndexOf(i));
                                 break;

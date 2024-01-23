@@ -46,6 +46,31 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
+        public void remove(string key)
+        {
+            //remove from all dictionaries
+            if (strings.ContainsKey(key))
+            {
+                strings.Remove(key);
+            }
+            if (doubles.ContainsKey(key))
+            {
+                doubles.Remove(key);
+            }
+            if (integers.ContainsKey(key))
+            {
+                integers.Remove(key);
+            }
+            if (sheets.ContainsKey(key))
+            {
+                sheets.Remove(key);
+            }
+            if (custom_types.ContainsKey(key))
+            {
+                custom_types.Remove(key);
+            }
+
+        }
         public Data Copy()
         {
             Data d = new Data();
