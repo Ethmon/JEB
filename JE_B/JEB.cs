@@ -487,7 +487,11 @@ namespace jumpE_basic
                     if (Base.commandRegistry.ContainsCommand(code[1]))
                     {
                         Base.commandRegistry.commands.Remove(code[1]);
-                        D.remove(code[1]);
+                        
+                    }
+                    if (D.isvar(code[1]))
+                {
+                    D.remove(code[1]);
                     }
                 //} catch { Console.WriteLine("Error: 4, Unable to Free, Line"+Base.position); }
             }
