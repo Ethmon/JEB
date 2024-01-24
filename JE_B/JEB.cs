@@ -755,7 +755,7 @@ namespace jumpE_basic
                             else
                             {
                                 equation += code[i] + " ";
-                                Debug.WriteLine("not recognized when statement");
+                                //Debug.WriteLine("not recognized when statement");
                             }
                         }
                         CalculationEngine engine = new CalculationEngine();
