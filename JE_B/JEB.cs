@@ -191,6 +191,7 @@ namespace jumpE_basic
         public int position;
         public bool run;
         public string data_storage = "@";
+        private new pre_defined_variable f = new pre_defined_variable();
 
         public base_runner(string taken, DATA_CONVERTER.Data data)
         {
@@ -222,7 +223,12 @@ namespace jumpE_basic
                     {
                         ((outer_commands)(interorouter)).Execute(this.code, datas[datas.Count() - 1]);
                     }
+                    
 
+                }
+                else if (datas[datas.Count() - 1].isvar(this.code[0]) && !(lines[position] == "{" || lines[position]=="}" || code[0] == "<<" || code[0]==">>"))
+                {
+                    f.Execute(this.code, datas[datas.Count() - 1], this);
                 }
                 else
                 {
@@ -357,6 +363,7 @@ namespace jumpE_basic
                 commands.Add("raise", raise); commands.Add("push", push); commands.Add("pop", pop);
                 commands.Add("IDD", new IDD()); commands.Add("IDT", new IDT());
                 commands.Add("free", new free());
+                commands.Add("skip", new Skip());
                 commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
             }
             public void add_command(string name, command_centralls type)
@@ -395,6 +402,36 @@ namespace jumpE_basic
             public virtual void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
             {
                 Debug.WriteLine("eh");
+            }
+        }
+        public class Skip : command_centrall
+        {
+            public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
+            {
+                int w = 0;
+                int q = Base.position + 1;
+                while (true)
+                {
+
+
+                    if (Base.lines[q] == "{")
+                    {
+                        w++;
+                    }
+                    if (Base.lines[q] == "}")
+                    {
+                        if (w == 1)
+                        {
+                            Base.changePosition(q);
+                            break;
+                        }
+                        else if (w != 0)
+                        {
+                            w--;
+                        }
+                    }
+                    q++;
+                }
             }
         }
         public class comment : command_centrall
@@ -484,11 +521,11 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 //try
-                    if (Base.commandRegistry.ContainsCommand(code[1]))
+                    /*if (Base.commandRegistry.ContainsCommand(code[1]))
                     {
                         Base.commandRegistry.commands.Remove(code[1]);
                         
-                    }
+                    }*/
                     if (D.isvar(code[1]))
                 {
                     D.remove(code[1]);
@@ -780,7 +817,7 @@ namespace jumpE_basic
                                     Base.changePosition(q);
                                     break;
                                 }
-                                else
+                                else if (w != 0)
                                 {
                                     w--;
                                 }
@@ -1131,12 +1168,12 @@ namespace Imported_commands
         }
         public class int_func : command_centrall
         {
-            pre_defined_variable Math_equation;
+            //pre_defined_variable Math_equation;
             CommandRegistry commands;
             IDictionary<string, double> drict = new Dictionary<string, double>();
             public int_func(pre_defined_variable j, CommandRegistry c)
             {
-                this.Math_equation = j;
+                //this.Math_equation = j;
                 this.commands = c;
 
             }
@@ -1149,7 +1186,7 @@ namespace Imported_commands
                     if (code.Count() == 2)
                     {
                         D.setI(code[1], 0);
-                        this.commands.add_command(code[1], this.Math_equation);
+                        //this.commands.add_command(code[1], this.Math_equation);
 
                     }
                     else if (code[2] == "=")
@@ -1173,10 +1210,10 @@ namespace Imported_commands
                         }
                         CalculationEngine engine = new CalculationEngine();
                         D.setI(code[1], (int)(engine.Calculate(equation, drict)));
-                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
                         {
                             Base.commandRegistry.add_command(code[1], this.Math_equation);
-                        }
+                        }*/
 
                     }
 
@@ -1518,11 +1555,11 @@ namespace Imported_commands
         }
         public class string_func : command_centrall
         {
-            pre_defined_variable varlee;
+            //pre_defined_variable varlee;
             CommandRegistry commands;
             public string_func(pre_defined_variable j, CommandRegistry c)
             {
-                this.varlee = j;
+                //this.varlee = j;
                 this.commands = c;
             }
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -1533,7 +1570,7 @@ namespace Imported_commands
                     if (code.Count() == 2)
                     {
                         D.setS(code[1], mesage);
-                        this.commands.add_command(code[1], this.varlee);
+                        //this.commands.add_command(code[1], this.varlee);
                     }
                     else if (code[2] == "=")
                     {
@@ -1552,10 +1589,10 @@ namespace Imported_commands
                             }
                         }
                         D.setS(code[1], mesage);
-                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
                         {
                             Base.commandRegistry.add_command(code[1], this.varlee);
-                        }
+                        }*/
                         
 
                     }
@@ -1568,12 +1605,12 @@ namespace Imported_commands
         }
         public class double_func : command_centrall
         {
-            pre_defined_variable Math_equation;
+            //pre_defined_variable Math_equation;
             CommandRegistry commands;
             IDictionary<string, double> drict = new Dictionary<string, double>();
             public double_func(pre_defined_variable j, CommandRegistry c)
             {
-                this.Math_equation = j;
+                //this.Math_equation = j;
                 this.commands = c;
             }
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -1584,7 +1621,7 @@ namespace Imported_commands
                     if (code.Count() == 2)
                     {
                         D.setD(code[1], 0);
-                        this.commands.add_command(code[1], this.Math_equation);
+                        //this.commands.add_command(code[1], this.Math_equation);
                     }
                     else if (code[2] == "=")
                     {
@@ -1607,10 +1644,10 @@ namespace Imported_commands
                         }
                         CalculationEngine engine = new CalculationEngine();
                         D.setD(code[1], (engine.Calculate(equation, drict)));
-                        if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
                         {
                             Base.commandRegistry.add_command(code[1], this.Math_equation);
-                        }
+                        }*/
                         
                     }
 
