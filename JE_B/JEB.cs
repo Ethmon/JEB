@@ -365,6 +365,8 @@ namespace jumpE_basic
                 commands.Add("free", new free());
                 commands.Add("skip", new Skip());
                 commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
+                commands.Add("raiseS", new raiseS()); commands.Add("raiseSA", new raiseSA());
+                commands.Add("bringA", new bringA()); commands.Add("pushA",new pushA());
             }
             public void add_command(string name, command_centralls type)
             {
@@ -541,6 +543,80 @@ namespace jumpE_basic
                 
             }
         }
+        public class raiseS : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                Data datas = new Data();
+                for (int i = 1; i < code.Count; i++)
+                {
+                    if (D.isvar(code[i]))
+                    {
+                        if (D.inint(code[i]))
+                        {
+                            datas.setI(code[i], D.referenceI(code[i]));
+                        }
+                        else if (D.indouble(code[i]))
+                        {
+                            datas.setD(code[i], D.referenceD(code[i]));
+                        }
+                        else if (D.instring(code[i]))
+                        {
+                            datas.setS(code[i], D.referenceS(code[i]));
+                        }
+                        else if (D.issheet(code[i]))
+                        {
+                            datas.setsheet(code[i], D.referenceSheet(code[i]));
+                        }
+                    }
+                }
+                Base.datas.Add(datas);
+
+            }
+        }
+        public class raiseSA : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                Data datas = new Data();
+                for (int i = 1; i < code.Count; i+=2)
+                {
+                    if (D.isvar(code[i]))
+                    {
+                        if (D.inint(code[i]))
+                        {
+                            datas.setI(code[i+1], D.referenceI(code[i]));
+                        }
+                        else if (D.indouble(code[i]))
+                        {
+                            datas.setD(code[i+1], D.referenceD(code[i]));
+                        }
+                        else if (D.instring(code[i]))
+                        {
+                            datas.setS(code[i+1], D.referenceS(code[i]));
+                        }
+                        else if (D.issheet(code[i]))
+                        {
+                            datas.setsheet(code[i+1], D.referenceSheet(code[i]));
+                        }
+                    }
+                    if(int.TryParse(code[i], out int ad))
+                    {
+                        if(ad == double.Parse(code[i]))
+                        {
+                            datas.setI(code[i + 1], ad);
+                        }
+                        else
+                        {
+                            datas.setD(code[i + 1], double.Parse(code[i]));
+                        }   
+                    }
+                }
+                Base.datas.Add(datas);
+
+            }
+        }
+
         public class sideLayer : command_centrall
         {             
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -619,6 +695,29 @@ namespace jumpE_basic
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
+        public class bringA : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (Base.datas[Base.datas.Count - 2].inint(code[1]))
+                {
+                    D.setI(code[2], Base.datas[Base.datas.Count - 2].referenceI(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].indouble(code[1]))
+                {
+                    D.setD(code[2], Base.datas[Base.datas.Count - 2].referenceD(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].instring(code[1]))
+                {
+                    D.setS(code[2], Base.datas[Base.datas.Count - 2].referenceS(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
+                {
+                    D.setsheet(code[2], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
+                }
+                //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
+            }
+        }
         public class push : command_centrall
         {
             //pre_defined_variable f = new pre_defined_variable();
@@ -633,6 +732,32 @@ namespace jumpE_basic
                 else if (D.issheet(code[1]))
                 {
                     Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1]));
+                }
+                //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
+                //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
+
+            }
+        }
+        public class pushA : command_centrall
+        {
+            //pre_defined_variable f = new pre_defined_variable();
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.inint(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setI(code[2], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.indouble(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setD(code[2], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.instring(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setS(code[2], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
+                }
+                else if (D.issheet(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setsheet(code[2], D.referenceSheet(code[1]));
                 }
                 //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
