@@ -14,6 +14,9 @@ using Microsoft.CSharp;
 using Jace;
 using System.CodeDom.Compiler;
 using System.Security.Policy;
+using System.Runtime.Remoting.Messaging;
+using System.Text.RegularExpressions;
+
 namespace jumpE_basic
 {
     class jumpE_basic
@@ -183,7 +186,6 @@ namespace jumpE_basic
         public List<string> lines = new List<string>();
         public string taken_in_string;
         public List<int> positions = new List<int>();
-        SimpleTokenizer ourstuff = new SimpleTokenizer();
         public CommandRegistry commandRegistry = new CommandRegistry();
         DATA_CONVERTER.Data data;
         public List<DATA_CONVERTER.Data> datas = new List<Data>();
@@ -196,7 +198,7 @@ namespace jumpE_basic
         public base_runner(string taken, DATA_CONVERTER.Data data)
         {
             this.taken_in_string = taken;
-            this.lines = ourstuff.Linizer(this.taken_in_string);
+            this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
             this.position = 0;
             this.run = true;
             datas.Add(data);
@@ -206,7 +208,7 @@ namespace jumpE_basic
             {
                 //try
                 {
-                    this.code = ourstuff.Tokenizer(this.lines[this.position]);//get all commands in the line.
+                    this.code = SimpleTokenizer.Tokenizer(this.lines[this.position]);//get all commands in the line.
                 }
                 //catch { Console.WriteLine("Error: 2, Line not recognized"); }
                 data.setI("LNC", this.position);// set line number for use as a variable in the code
@@ -268,7 +270,7 @@ namespace jumpE_basic
         }
         public class SimpleTokenizer
         {
-            public List<string> Linizer(string input)
+            public static List<string> Linizer(string input)
             {
                 List<string> words = new List<string>();
                 string[] lines = input.Split(new char[] { '\n', ';','\r' }, StringSplitOptions.RemoveEmptyEntries);
@@ -280,7 +282,7 @@ namespace jumpE_basic
 
                 return words;
             }
-            public List<string> Tokenizer(string input)
+            public static List<string> Tokenizer(string input)
             {
                 List<string> words = new List<string>();
                 string[] tokens = input.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
@@ -292,7 +294,7 @@ namespace jumpE_basic
 
                 return words;
             }
-            public List<string> comandizer(string input)
+            public static List<string> comandizer(string input)
             {
                 List<string> words = new List<string>();
                 string[] tokens = input.Split(new char[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
@@ -303,6 +305,11 @@ namespace jumpE_basic
                 }
 
                 return words;
+            }
+            // just removes all '\t' and ' ' from the string
+            public static string no_tab_spaces(string input)
+            {
+                return Regex.Replace(input, @"[\t ]", "");
             }
         }
         public class CommandRegistry
@@ -416,11 +423,11 @@ namespace jumpE_basic
                 {
 
 
-                    if (Base.lines[q] == "{")
+                    if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "{")
                     {
                         w++;
                     }
-                    if (Base.lines[q] == "}")
+                    if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "}")
                     {
                         if (w == 1)
                         {
@@ -469,13 +476,21 @@ namespace jumpE_basic
                         }*/
                         else if (code[i] == "\"" && code[i + 2] == "\"")
                         {
-                            Message += (D.referenceVar(code[i + 1]) + " ");
+                            Message += (D.referenceVar(code[i + 1]));
 
                             i += 2;
                         }
+                        else if (code[i] == "!S!")
+                        {
+                            Message += " ";
+                        }
+                        else if(code[i] == "\\!S!")
+                        {
+                            Message += "!S!";
+                        }
                         else
                         {
-                            Message += (code[i] + " ");
+                            Message += (code[i]);
                         }
 
                     }
@@ -931,11 +946,11 @@ namespace jumpE_basic
                         {
 
 
-                            if (Base.lines[q] == "{")
+                            if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "{")
                             {
                                 w++;
                             }
-                            if (Base.lines[q] == "}")
+                            if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "}")
                             {
                                 if (w == 1)
                                 {
@@ -1647,12 +1662,16 @@ namespace Imported_commands
                         {
                             if (code[i] == "\"" && code[i + 2] == "\"")
                             {
-                                mesage += D.referenceVar(code[i + 1]) + " ";
+                                mesage += D.referenceVar(code[i + 1]);
                                 i += 2;
+                            }
+                            else if (code[i] == "!S!")
+                            {
+                                mesage += " ";
                             }
                             else
                             {
-                                mesage += code[i] + " ";
+                                mesage += code[i];
                                 i++;
                             }
                         }
@@ -1663,8 +1682,12 @@ namespace Imported_commands
                         {
                             if (code[i] == "\"" && code[i + 2] == "\"")
                             {
-                                mesage += D.referenceVar(code[i + 1]) + " ";
+                                mesage += D.referenceVar(code[i + 1]);
                                 i += 2;
+                            }
+                            else if (code[i] == "!S!")
+                            {
+                                mesage += " ";
                             }
                             else
                             {
@@ -1704,12 +1727,17 @@ namespace Imported_commands
                         {
                             if (code[i] == "\"" && code[i + 2] == "\"")
                             {
-                                mesage += D.referenceVar(code[i + 1]) + " ";
+                                mesage += D.referenceVar(code[i + 1]);
                                 i += 2;
+
+                            }
+                            else if (code[i] == "!S!")
+                            {
+                                mesage += " ";
                             }
                             else
                             {
-                                mesage += code[i] + " ";
+                                mesage += code[i];
                                 i++;
                             }
                         }
@@ -1823,7 +1851,7 @@ namespace Imported_commands
                         foreach (string i in Base.lines)
                         {
                             //Console.WriteLine(i);Console.WriteLine(">> " + code[2]);
-                            if (i==">> " + code[2])
+                            if (SimpleTokenizer.no_tab_spaces(i)==">>" + code[2])
                             {
                                 
                                 //D.setI(code[2], Base.get_position());
