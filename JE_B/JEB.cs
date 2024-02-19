@@ -382,6 +382,34 @@ namespace jumpE_basic
                 commands.Add("Line", new Line_func(Math_equation, this));
                 commands.Add("File", new File_func());
                 commands.Add("Function", new Function_func(Math_equation, this));
+                // list all commands here :
+                // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function
+                // list all commands that refer to sheets here : 
+                // sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, raise, IDD, IDT, free
+                // List all eventing commands here :
+                // Line, File, Function
+                // List all variable declerations here :
+                // double, DOUBLE, Double, string, String, STRING, int, INT, Line , File, Function
+                // List all logic commands here :
+                // when, When, if, skip
+                // List all input commands here :
+                // inputI, inputi, InputI, inputS, inputs, InputS, inputD, inputd, InputD
+                // List all commands that are used to manipulate the stack here :
+                // raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL, callLayer, sideLayer
+                // List all commands that are used to manipulate the file system here :
+                // Line, File, Function, use, useC, usec
+                // List all commands that are used to manipulate the console here :
+                // print, Print
+                // List all commands that are used to manipulate the program here :
+                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, comment, //, #
+                // List all commands that are Alocate memory here :
+                // sideLayer, remL, callLayer
+                // List all commands that are used to manipulate the program flow here :
+                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, when, When, if, skip
+                // List all commands that are used to manipulate the data converter here :
+                // IDD, IDT, free, raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL
+
+
             }
             public void add_command(string name, command_centralls type)
             {
