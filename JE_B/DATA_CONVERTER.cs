@@ -32,6 +32,10 @@ namespace DATA_CONVERTER
         Dictionary<string, double> doubles = new Dictionary<string, double>();
         Dictionary<string, int> integers = new Dictionary<string, int>();
         public Dictionary<string, Data> sheets = new Dictionary<string, Data>();
+        Dictionary<string, Line> lines = new Dictionary<string, Line>();
+        Dictionary<string, Function> functions = new Dictionary<string, Function>();
+        Dictionary<string, file> files = new Dictionary<string, file>();
+        
         Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
         public int identifier = 0;
         public int typeidentifier = 0;
@@ -69,6 +73,7 @@ namespace DATA_CONVERTER
             {
                 custom_types.Remove(key);
             }
+            
 
         }
         public Data Copy()
@@ -130,6 +135,39 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
+        public Line referenceLine(string key)
+        {
+            if (lines.ContainsKey(key))
+            {
+                return lines[key];
+            }
+            else
+            {
+                throw new ArgumentException(key + " not initiallized");
+            }
+        }
+        public Function referenceFunction(string key)
+        {
+            if (functions.ContainsKey(key))
+            {
+                return functions[key];
+            }
+            else
+            {
+                throw new ArgumentException(key + " not initiallized");
+            }
+        }
+        public file referenceFile(string key)
+        {
+            if (files.ContainsKey(key))
+            {
+                return files[key];
+            }
+            else
+            {
+                throw new ArgumentException(key + " not initiallized");
+            }
+        }
         public Data referenceSheet(string key)
         {
             if (sheets.ContainsKey(key))
@@ -151,7 +189,7 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 return true;
             }
@@ -200,6 +238,31 @@ namespace DATA_CONVERTER
             }
             return false;
         }
+        
+        public bool isLine(string key)
+        {
+            if (lines.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool isFunction(string key)
+        {
+            if (functions.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool isFile(string key)
+        {
+            if (files.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
         public Object referenceVar(string key)
         {
             if (doubles.ContainsKey(key))
@@ -222,6 +285,18 @@ namespace DATA_CONVERTER
             {
                 return custom_types[key];
             }
+            else if(lines.ContainsKey(key))
+            {
+                return lines[key];
+            }
+            else if (functions.ContainsKey(key))
+            {
+                return functions[key];
+            }
+            else if (files.ContainsKey(key))
+            {
+                return files[key];
+            }
             else
             {
                 throw new ArgumentException(key + " not initiallized");
@@ -230,7 +305,7 @@ namespace DATA_CONVERTER
         }
         public void setS(string key, string data)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -250,10 +325,76 @@ namespace DATA_CONVERTER
                 }
             }
         }
+        public void setLine(string key, Line data)
+        {
+            if (doubles.ContainsKey(key) || strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || files.ContainsKey(key) || functions.ContainsKey(key))
+            {
+                Console.WriteLine("variable set to other type");
+            }
+            else
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (lines.ContainsKey(key))
+                    {
+                        lines.Remove(key);
+                    }
+                    lines.Add(key, data);
+                }
+            }
+        }
+        public void setFunction(string key, Function data)
+        {
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || files.ContainsKey(key)||strings.ContainsKey(key))
+            {
+                Console.WriteLine("variable set to other type");
+            }
+            else
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (functions.ContainsKey(key))
+                    {
+                        functions.Remove(key);
+                    }
+                    functions.Add(key, data);
+                }
+            }
+        }
+        public void setFile(string key, file data)
+        {
+            if (doubles.ContainsKey(key) ||strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key)||functions.ContainsKey(key))
+            {
+                Console.WriteLine("variable set to other type");
+            }
+            else
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (files.ContainsKey(key))
+                    {
+                        files.Remove(key);
+                    }
+                    files.Add(key, data);
+                }
+            }
+        }
 
         public void setD(string key, double data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -275,7 +416,7 @@ namespace DATA_CONVERTER
         }
         public void setCustom(string key, Dictionary<string, Object> data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || doubles.ContainsKey(key))
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || doubles.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -298,7 +439,7 @@ namespace DATA_CONVERTER
 
         public void setsheet(string key, Data data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || doubles.ContainsKey(key) || custom_types.ContainsKey(key))
+            if (strings.ContainsKey(key) || integers.ContainsKey(key) || doubles.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -320,7 +461,7 @@ namespace DATA_CONVERTER
         }
         public void setI(string key, int data)
         {
-            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key))
+            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -341,5 +482,151 @@ namespace DATA_CONVERTER
             }
         }
 
+    }
+    public partial class Line
+    {
+        private int line_number;
+        private string line_string;
+        private Data acsesed_data;
+        public Line()
+        {
+            acsesed_data = new Data();
+            line_number = 0;
+        }
+        public Line(int line_num)
+        {
+            acsesed_data = new Data();
+            line_number = line_num;
+        }
+        public Line(int line_number, Data acsesed_data) : this(line_number)
+        {
+            this.acsesed_data = acsesed_data;
+        }
+        public void set_line_number(int line_number)
+        {
+            this.line_number = line_number;
+        }
+        public int get_line_number()
+        {
+            return line_number;
+        }
+        public Data get_acsesed_data()
+        {
+            return acsesed_data;
+        }
+        public void change_acsesed_data(Data acsesed_data)
+        {
+           this.acsesed_data = acsesed_data;
+        }
+        public void set_line_string(string line_string)
+        {
+            this.line_string = line_string;
+        }
+        public void uses()
+        {
+            Execute();
+        }
+        partial void Execute();
+    }
+    public partial class Function
+    {
+        private int start_int;
+        private int end_int;
+        private string function_string;
+        private Data acsesed_data;
+        public Function()
+        {
+               acsesed_data = new Data();
+            start_int = 0;
+            end_int = 1;
+        }
+        public Function(int start_int, int end_int)
+        {
+            acsesed_data = new Data();
+            this.start_int = start_int;
+            this.end_int = end_int;
+        }
+        public Function(int start_int, int end_int, Data acsesed_data) : this(start_int, end_int)
+        {
+            this.acsesed_data = acsesed_data;
+        }
+        public void set_start_int(int start_int)
+        {
+            this.start_int = start_int;
+        }
+        public int get_start_int()
+        {
+            return start_int;
+        }
+        public void Setfunction_string(string function_string)
+        {
+            this.function_string = function_string;
+        }
+        public void set_end_int(int end_int)
+        {
+            this.end_int = end_int;
+        }
+        public int get_end_int()
+        {
+            return end_int;
+        }
+        public Data get_acsesed_data()
+        {
+            return acsesed_data;
+        }
+        public void change_acsesed_data(Data acsesed_data)
+        {
+            this.acsesed_data = acsesed_data;
+        }
+        public void uses()
+        {
+            Execute();
+        }
+        partial void Execute();
+    }
+    public partial class file
+    {
+        private string file_path;
+        private string file_context;
+        private Data acsesed_data;
+        public file()
+        {
+            acsesed_data = new Data();
+            file_path = "";
+        }
+        public file(string file_path)
+        {
+            acsesed_data = new Data();
+            this.file_path = file_path;
+        }
+        public file(string file_path, Data acsesed_data) : this(file_path)
+        {
+            this.acsesed_data = acsesed_data;
+        }
+        public void set_file_path(string file_path)
+        {
+            this.file_path = file_path;
+        }
+        public string get_file_path()
+        {
+            return file_path;
+        }
+        public Data get_acsesed_data()
+        {
+            return acsesed_data;
+        }
+        public void set_context(string file_context)
+        {
+            this.file_context = file_context;
+        }
+        public void change_acsesed_data(Data acsesed_data)
+        {
+            this.acsesed_data = acsesed_data;
+        }
+        public void uses()
+        {
+            Execute();
+        }
+        partial void Execute();
     }
 }

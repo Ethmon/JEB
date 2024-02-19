@@ -16,6 +16,10 @@ using System.CodeDom.Compiler;
 using System.Security.Policy;
 using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
+using System.Net;
+using System.Runtime.InteropServices;
+using jumpE_basic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace jumpE_basic
 {
@@ -247,7 +251,7 @@ namespace jumpE_basic
                 }
                 else
                 {
-                    this.position = 0;
+                    break;
                 }
 
 
@@ -374,6 +378,10 @@ namespace jumpE_basic
                 commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
                 commands.Add("raiseS", new raiseS()); commands.Add("raiseSA", new raiseSA());
                 commands.Add("bringA", new bringA()); commands.Add("pushA",new pushA());
+                commands.Add("pushDL", new pushDL());
+                commands.Add("Line", new Line_func(Math_equation, this));
+                commands.Add("File", new File_func());
+                commands.Add("Function", new Function_func(Math_equation, this));
             }
             public void add_command(string name, command_centralls type)
             {
@@ -779,6 +787,21 @@ namespace jumpE_basic
 
             }
         }
+        public class pushDL : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.instring(code[1]))
+                {
+                    if (D.issheet(D.referenceS(code[1]+"#")))
+                    {
+                        Base.datas[Base.datas.Count() - 2].setsheet(D.referenceS(code[1] + "#"), D);
+                        return;
+                    }
+                }
+                Base.datas[Base.datas.Count() - 2].setsheet(code[1], D);
+            }
+        }
         public class pop : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -815,7 +838,12 @@ namespace jumpE_basic
 
                     }*/ // this will be for booleans when i get around to 
                         //else { }
-                    if (code[1] == "typ")
+                    if (code[1] == "str")
+                    {
+                        if (D.referenceS(code[2]).Equals(D.referenceS(code[3])))
+                            result = true;
+                    }
+                    else if (code[1] == "typ")
                     {
                         int a = 0;
                         int b = -1;
@@ -829,12 +857,12 @@ namespace jumpE_basic
                         }
                         else if (D.instring(code[2]))
                         {
-                            if (D.issheet(D.referenceS(code[2])+"#"))
+                            if (D.issheet(D.referenceS(code[2]) + "#"))
                             {
-                                a = D.referenceSheet(D.referenceS(code[2])+"#").typeidentifier;
+                                a = D.referenceSheet(D.referenceS(code[2]) + "#").typeidentifier;
                             }
                         }
-                        else if (int.TryParse(code[2],out int ad))
+                        else if (int.TryParse(code[2], out int ad))
                         {
                             a = ad;
                         }
@@ -855,9 +883,9 @@ namespace jumpE_basic
                         }
                         else if (int.TryParse(code[3], out int bd))
                         {
-                            b= bd;
+                            b = bd;
                         }
-                        if(b == a)
+                        if (b == a)
                         {
                             result = true;
                         }
@@ -1364,6 +1392,173 @@ namespace Imported_commands
                 }
             }
         }
+        public class Line_func : command_centrall
+        {
+                        //pre_defined_variable Math_equation;
+            CommandRegistry commands;
+            IDictionary<string, double> drict = new Dictionary<string, double>();
+            public Line_func(pre_defined_variable j, CommandRegistry c)
+            {
+                //this.Math_equation = j;
+                this.commands = c;
+
+            }
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                
+                try
+                {
+                    string equation = "";
+                    if (code.Count() == 2)
+                    {
+                        D.setD(code[1], 0);
+                        //this.commands.add_command(code[1], this.Math_equation);
+
+                    }
+                    else if (code[2] == "=")
+                    {
+                        for (int i = 3; i < code.Count(); i++)
+                        {
+                            double j;
+                            if (Double.TryParse(code[i], out j))
+                            {
+                                equation += j + " ";
+                            }
+                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
+                                                           code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
+                            {
+                                equation += code[i] + " ";
+                            }
+                            else if (D.isnumvar(code[i]))
+                            {
+                                equation += D.referenceVar(code[i]) + " ";
+                            }
+                        }
+                        CalculationEngine engine = new CalculationEngine();
+                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)),D);
+                        D.setLine(code[1], u);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Initialization error " + e);
+                }
+            }
+        }
+
+        public class Function_func : command_centrall
+        {
+            //pre_defined_variable Math_equation;
+            CommandRegistry commands;
+            IDictionary<string, double> drict = new Dictionary<string, double>();
+            public Function_func(pre_defined_variable j, CommandRegistry c)
+            {
+                //this.Math_equation = j;
+                this.commands = c;
+
+            }
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+
+                try
+                {
+                    string equationa = "";
+                    string equationb = "";
+                    int ended = 0;
+                    if (code.Count() == 2)
+                    {
+                        D.setD(code[1], 0);
+                        //this.commands.add_command(code[1], this.Math_equation);
+
+                    }
+                    else if (code[2] == "=")
+                    {
+                        for (int i = 3; i < code.Count(); i++)
+                        {
+                            if (code[i] == ",")
+                            {
+                                ended = i;
+                                break;
+                            }
+                            double j;
+                            if (Double.TryParse(code[i], out j))
+                            {
+                                equationa += j + " ";
+                            }
+                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
+                                                           code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
+                            {
+                                equationa += code[i] + " ";
+                            }
+                            else if (D.isnumvar(code[i]))
+                            {
+                                equationa += D.referenceVar(code[i]) + " ";
+                            }
+                        }
+                        for (int i = ended; i < code.Count(); i++)
+                        {
+                            double j;
+                            if (Double.TryParse(code[i], out j))
+                            {
+                                equationb += j + " ";
+                            }
+                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
+                                                           code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
+                            {
+                                equationb += code[i] + " ";
+                            }
+                            else if (D.isnumvar(code[i]))
+                            {
+                                equationb += D.referenceVar(code[i]) + " ";
+                            }
+                        }
+
+                        CalculationEngine engine = new CalculationEngine();
+                        DATA_CONVERTER.Function u = new Function((int)(engine.Calculate(equationa, drict)), (int)(engine.Calculate(equationb, drict)), D);
+                        D.setFunction(code[1], u);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Initialization error " + e);
+                }
+            }
+        }
+
+        public class File_func : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (code.Count() == 3)
+                {
+                    D.setFile(code[1],new file (code[2], D));
+                }
+                else if (code.Count() == 4)
+                {
+                    if (D.issheet(code[3]))
+                    {
+                        D.setFile(code[1], new file(code[2], D.referenceSheet(code[3])));
+                    }
+                    else if (D.instring(code[3]))
+                    {
+                        if (D.issheet(D.referenceS(code[3]+"#")))
+                        {
+                            D.setFile(code[1], new file(code[2], D.referenceSheet(D.referenceS(code[3] + "#"))));
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
         public class pre_defined_variable : command_centrall
         {
             IDictionary<string, double> drict = new Dictionary<string, double>();
@@ -1698,6 +1893,73 @@ namespace Imported_commands
                     }
                     D.setS(code[0], mesage);
                 }
+                if (D.isLine(code[0]))
+                {
+                    
+                    if(code.Count == 1)
+                    {
+                        
+                        D.referenceLine(code[0]).set_line_string(Base.lines[D.referenceLine(code[0]).get_line_number()]+"\nend");
+                        D.referenceLine(code[0]).uses();
+                    }
+                    else if (code[1]== "=")
+                    {
+                        if (D.isLine(code[2]))
+                        {
+                            D.referenceLine(code[0]).set_line_number(D.referenceLine(code[2]).get_line_number());
+                        }
+                        else if (D.inint(code[2]))
+                        {
+                            D.referenceLine(code[0]).set_line_number(D.referenceI(code[2]));
+                        }
+                        else if (D.instring(code[2]))
+                        {
+                            if (D.isLine(D.referenceS(code[2])))
+                            {
+                                D.referenceLine(code[0]).set_line_number(D.referenceLine(D.referenceS(code[2])).get_line_number());
+                            }
+                            else if (D.inint(D.referenceS(code[2])))
+                            {
+                                D.referenceLine(code[0]).set_line_number(D.referenceI(D.referenceS(code[2])));
+                            }
+                        }
+                    }
+                }
+                if (D.isFunction(code[0]))
+                {
+                    if (code.Count == 1)
+                    {
+                        string mesage = "";
+                        for(int i = D.referenceFunction(code[0]).get_start_int(); i < D.referenceFunction(code[0]).get_end_int(); i++)
+                        {
+                            mesage += Base.lines[i] + "\n";
+                        }
+                        mesage += "end";
+                        D.referenceFunction(code[0]).Setfunction_string(mesage);
+                        D.referenceLine(code[0]).uses();
+                    }
+                }
+                if (D.isFile(code[0]))
+                {
+                    if (code.Count == 1)
+                    {
+
+                        try
+                        {
+                            string fileName = @"" + D.referenceFile(code[0]).get_file_path();
+                            using (StreamReader streamReader = File.OpenText(fileName))
+                            {
+                                string text = streamReader.ReadToEnd();
+                                D.referenceFile(code[0]).set_context(text);
+                            }
+                            D.referenceFile(code[0]).uses();
+                        }
+                        catch
+                        {
+                            Console.WriteLine("File not found");
+                        }
+                    }
+                }
 
             }
         }
@@ -1935,8 +2197,35 @@ namespace Imported_commands
             }
 
         }*/
+        
 
     }
+    
 
 
+}
+namespace DATA_CONVERTER
+{
+    public partial class Line
+    {
+        partial void Execute()
+        {
+            base_runner bases = new base_runner(this.line_string,this.acsesed_data);
+        }
+
+    }
+    public partial class Function
+    {
+        partial void Execute()
+        {
+            base_runner bases = new base_runner(this.function_string,this.acsesed_data);
+        }
+    }
+    public partial class file
+    {
+        partial void Execute()
+        {
+            base_runner bases = new base_runner(this.file_context,this.acsesed_data);
+        }
+    }
 }
