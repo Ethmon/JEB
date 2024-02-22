@@ -61,6 +61,18 @@ namespace jumpE_basic
                         DATA_CONVERTER.Data datas = new DATA_CONVERTER.Data();
                         data = datas;
                         Console.WriteLine("CLEAR");
+                        base_runner.hard_stop = false;
+                    }
+                }
+                else if (hell == "debug")
+                {
+                    if(base_runner.debg == true)
+                    {
+                        base_runner.debg = false;
+                    }
+                    else if(base_runner.debg == false)
+                    {
+                        base_runner.debg = true;
                     }
                 }
                 else if (hell == "run")
@@ -196,7 +208,10 @@ namespace jumpE_basic
         DATA_CONVERTER.command_centralls interorouter = new DATA_CONVERTER.command_centralls();
         public int position;
         public bool run;
-        public string data_storage = "@";
+        private static int real_count = 0;
+        public static bool debg = false;
+        public static bool hard_stop = false;
+        //public string data_storage = "@";
         private new pre_defined_variable f = new pre_defined_variable();
 
         public base_runner(string taken, DATA_CONVERTER.Data data)
@@ -204,12 +219,24 @@ namespace jumpE_basic
             this.taken_in_string = taken;
             this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
             this.position = 0;
-            this.run = true;
+            this.run = true; 
             datas.Add(data);
             data.setI("LNT", 0);
 
             while (this.run)
             {
+                if(debg)
+                {
+                    Console.WriteLine(lines[position] + "   " + real_count);
+                    Console.ReadLine();
+
+                }
+                if(hard_stop)
+                {
+                    this.run = false;
+                    break;
+                    
+                }
                 //try
                 {
                     this.code = SimpleTokenizer.Tokenizer(this.lines[this.position]);//get all commands in the line.
@@ -248,6 +275,7 @@ namespace jumpE_basic
                 if (this.lines.Count >= this.position + 1)
                 {
                     this.position++;
+                    real_count++;
                 }
                 else
                 {
@@ -382,6 +410,8 @@ namespace jumpE_basic
                 commands.Add("Line", new Line_func(Math_equation, this));
                 commands.Add("File", new File_func());
                 commands.Add("Function", new Function_func(Math_equation, this));
+                commands.Add("bringDL", new bringDL());
+                commands.Add("HS", new Hard_stop());
                 // list all commands here :
                 // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function
                 // list all commands that refer to sheets here : 
@@ -442,6 +472,13 @@ namespace jumpE_basic
                 }
             }
         }
+        public class Hard_stop : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                base_runner.hard_stop = true;
+            }
+        }
         public class command_centrall : command_centralls
         {
             public virtual void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
@@ -476,6 +513,32 @@ namespace jumpE_basic
                         }
                     }
                     q++;
+                }
+            }
+        }
+        public class pushGOD : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.inint(code[1]))
+                {
+                    Base.datas[0].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.indouble(code[1]))
+                {
+                    Base.datas[0].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                }
+                else if (D.instring(code[1]))
+                {
+                    Base.datas[0].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
+                }
+                else if (D.issheet(code[1]))
+                {
+                    Base.datas[0].setsheet(code[1], D.referenceSheet(code[1]));
+                }
+                else if (D.issheet(code[1] + "#"))
+                {
+                    Base.datas[0].setsheet(code[1], D.referenceSheet(code[1] + "#"));
                 }
             }
         }
@@ -743,6 +806,8 @@ namespace jumpE_basic
                 {
                     D.setsheet(code[1], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
                 }
+                //adding lines functions and files
+                
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
@@ -769,6 +834,21 @@ namespace jumpE_basic
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
+        public class bringDL : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (Base.datas[Base.datas.Count - 2].instring(code[1]))
+                {
+                    if (Base.datas[Base.datas.Count - 2].issheet(Base.datas[Base.datas.Count - 2].referenceS(code[1]) + "#"))
+                    {
+                        D.setsheet(code[2], Base.datas[Base.datas.Count - 2].referenceSheet(Base.datas[Base.datas.Count - 2].referenceS(code[1]) + "#"));
+                        return;
+                    }
+                }
+                D.setsheet(code[2], Base.datas[Base.datas.Count - 2]);
+            }
+        }
         public class push : command_centrall
         {
             //pre_defined_variable f = new pre_defined_variable();
@@ -783,6 +863,10 @@ namespace jumpE_basic
                 else if (D.issheet(code[1]))
                 {
                     Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1]));
+                }
+                else if (D.issheet(code[1] + "#"))
+                {
+                    Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1] + "#"));
                 }
                 //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
@@ -1926,9 +2010,12 @@ namespace Imported_commands
                     
                     if(code.Count == 1)
                     {
-                        
-                        D.referenceLine(code[0]).set_line_string(Base.lines[D.referenceLine(code[0]).get_line_number()]+"\nend");
                         D.referenceLine(code[0]).uses();
+                    }
+                    else if (code[1]=="inst")
+                    {
+                        
+                        D.referenceLine(code[0]).set_line_string(Base.lines[D.referenceLine(code[0]).get_line_number()] + "\nend");
                     }
                     else if (code[1]== "=")
                     {
@@ -1957,20 +2044,46 @@ namespace Imported_commands
                 {
                     if (code.Count == 1)
                     {
-                        string mesage = "";
-                        for(int i = D.referenceFunction(code[0]).get_start_int(); i < D.referenceFunction(code[0]).get_end_int(); i++)
-                        {
-                            mesage += Base.lines[i] + "\n";
-                        }
-                        mesage += "end";
-                        D.referenceFunction(code[0]).Setfunction_string(mesage);
-                        D.referenceLine(code[0]).uses();
+                        D.referenceFunction(code[0]).uses();
                     }
+                    else if (code.Count == 2)
+                    {
+                        if (code[1] == "inst")
+                        {
+                            string mesage = "";
+                            for (int i = D.referenceFunction(code[0]).get_start_int(); i < D.referenceFunction(code[0]).get_end_int(); i++)
+                            {
+                                mesage += Base.lines[i] + "\n";
+                            }
+                            mesage += "end";
+                            D.referenceFunction(code[0]).Setfunction_string(mesage);
+                        }
+                    }
+                    else if (code[1]=="=")
+                    {
+                        if (D.issheet(code[2]))
+                        {
+                            D.referenceFunction(code[0]).change_acsesed_data(D.referenceSheet(code[2]));
+                        }
+                        else if (D.instring(code[2]))
+                        {
+                            if (D.issheet(D.referenceS(code[2])+"#"))
+                            {
+                                D.referenceFunction(code[0]).change_acsesed_data(D.referenceSheet(D.referenceS(code[2])+"#"));
+                            }
+                        }
+                    }
+                    
                 }
                 if (D.isFile(code[0]))
                 {
                     if (code.Count == 1)
                     {
+                        D.referenceFile(code[0]).uses();
+                    }
+                    else if (code.Count == 2)
+                    {
+                        if (code[1]=="inst")
 
                         try
                         {
@@ -1980,11 +2093,26 @@ namespace Imported_commands
                                 string text = streamReader.ReadToEnd();
                                 D.referenceFile(code[0]).set_context(text);
                             }
-                            D.referenceFile(code[0]).uses();
+                            
                         }
                         catch
                         {
                             Console.WriteLine("File not found");
+                        }
+                    }
+                    
+                    else if (code[1] == "=")
+                    {
+                        if (D.issheet(code[2]))
+                        {
+                            D.referenceFile(code[0]).change_acsesed_data(D.referenceSheet(code[2]));
+                        }
+                        else if (D.instring(code[2]))
+                        {
+                            if (D.issheet(D.referenceS(code[2]) + "#"))
+                            {
+                                D.referenceFile(code[0]).change_acsesed_data(D.referenceSheet(D.referenceS(code[2]) + "#"));
+                            }
                         }
                     }
                 }

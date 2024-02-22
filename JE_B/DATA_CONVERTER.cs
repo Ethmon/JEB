@@ -57,21 +57,33 @@ namespace DATA_CONVERTER
             {
                 strings.Remove(key);
             }
-            if (doubles.ContainsKey(key))
+            else if (doubles.ContainsKey(key))
             {
                 doubles.Remove(key);
             }
-            if (integers.ContainsKey(key))
+            else if (integers.ContainsKey(key))
             {
                 integers.Remove(key);
             }
-            if (sheets.ContainsKey(key))
+            else if (sheets.ContainsKey(key))
             {
                 sheets.Remove(key);
             }
-            if (custom_types.ContainsKey(key))
+            else if (custom_types.ContainsKey(key))
             {
                 custom_types.Remove(key);
+            }
+            else if (lines.ContainsKey(key))
+            {
+                lines.Remove(key);
+            }
+            else if (functions.ContainsKey(key))
+            {
+                functions.Remove(key);
+            }
+            else if (files.ContainsKey(key))
+            {
+                files.Remove(key);
             }
             
 
@@ -87,6 +99,9 @@ namespace DATA_CONVERTER
             {
                 d.sheets.Add(key, sheets[key].Copy());
             }
+            d.lines = new Dictionary<string, Line>(lines);
+            d.functions = new Dictionary<string, Function>(functions);
+            d.files = new Dictionary<string, file>(files);
             return d;
         }
         public void SaveToFile(string filePath)
