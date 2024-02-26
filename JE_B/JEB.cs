@@ -20,6 +20,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using jumpE_basic;
 using static System.Net.Mime.MediaTypeNames;
+using System.Net.Mail;
 
 namespace jumpE_basic
 {
@@ -343,6 +344,30 @@ namespace jumpE_basic
             {
                 return Regex.Replace(input, @"[\t ]", "");
             }
+            // this returns lists of all statments for if statments. thses include not, or, and, and but
+            public static List<List<string>> Statementizer(List<string> input)
+            {
+                int start = 1; // Start from the second word
+                List<List<string>> output = new List<List<string>>();
+
+                for (int i = 1; i < input.Count; i++) // Start loop from 1
+                {
+                    if (input[i] == "not" || input[i] == "or" || input[i] == "and" || input[i] == "nor")
+                    {
+                        output.Add(input.GetRange(start, i - start));
+                        start = i; // Move the start to the next index
+                    }
+                }
+
+                // Add the last statement
+                if (start < input.Count)
+                {
+                    output.Add(input.GetRange(start, input.Count - start));
+                }
+
+                return output;
+            }
+
         }
         public class CommandRegistry
         {
@@ -413,9 +438,9 @@ namespace jumpE_basic
                 commands.Add("bringDL", new bringDL());
                 commands.Add("HS", new Hard_stop());
                 // list all commands here :
-                // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function
+                // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function, bringDL, HS, 
                 // list all commands that refer to sheets here : 
-                // sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, raise, IDD, IDT, free
+                // sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, raise, IDD, IDT, free, pushGOD, bringDL
                 // List all eventing commands here :
                 // Line, File, Function
                 // List all variable declerations here :
@@ -425,19 +450,19 @@ namespace jumpE_basic
                 // List all input commands here :
                 // inputI, inputi, InputI, inputS, inputs, InputS, inputD, inputd, InputD
                 // List all commands that are used to manipulate the stack here :
-                // raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL, callLayer, sideLayer
+                // raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL, callLayer, sideLayer, pushGOD, bringDL
                 // List all commands that are used to manipulate the file system here :
                 // Line, File, Function, use, useC, usec
                 // List all commands that are used to manipulate the console here :
                 // print, Print
                 // List all commands that are used to manipulate the program here :
-                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, comment, //, #
+                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, comment, //, #, HS
                 // List all commands that are Alocate memory here :
                 // sideLayer, remL, callLayer
                 // List all commands that are used to manipulate the program flow here :
-                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, when, When, if, skip
+                // jump, jp, JP, JUMP, end, stop, END, return, Return , RETURN, <<, when, When, if, skip, HS
                 // List all commands that are used to manipulate the data converter here :
-                // IDD, IDT, free, raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL
+                // IDD, IDT, free, raise, push, pop, bring, raiseS, raiseSA, bringA, pushA, pushDL pushGOD, bringDL
 
 
             }
@@ -938,147 +963,249 @@ namespace jumpE_basic
             }
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-
-                //try
+                
+                bool ors = false;
+                bool ands = true;
+                bool orsD = false;
+                bool endresult = false;
+                List<List<string>> statments = SimpleTokenizer.Statementizer(code);
+                for (int iff = 0; iff < statments.Count(); iff++)
                 {
-                    Boolean result = false;
-                    string equation = "";
-                    /*if (code.Count() == 2)
+                    //try
                     {
-                        D.setI(code[1], 0);
-                        this.commands.add_command(code[1], this.Math_equation);
+                        if (statments[iff].Count() < 2)
+                        {
+                            continue;
+                        }
+                        Boolean result = false;
+                        string equation = "";
+                        /*if (code.Count() == 2)
+                        {
+                            D.setI(code[1], 0);
+                            this.commands.add_command(code[1], this.Math_equation);
 
-                    }*/ // this will be for booleans when i get around to 
-                        //else { }
-                    if (code[1] == "str")
-                    {
-                        if (D.referenceS(code[2]).Equals(D.referenceS(code[3])))
-                            result = true;
-                    }
-                    else if (code[1] == "typ")
-                    {
-                        int a = 0;
-                        int b = -1;
-                        if (D.inint(code[2]))
+                        }*/ // this will be for booleans when i get around to 
+                            //else { }
+                        if (statments[iff][1] == "str")
                         {
-                            a = D.referenceI(code[2]);
-                        }
-                        else if (D.issheet(code[2]))
-                        {
-                            a = D.referenceSheet(code[2]).typeidentifier;
-                        }
-                        else if (D.instring(code[2]))
-                        {
-                            if (D.issheet(D.referenceS(code[2]) + "#"))
+                            if (D.referenceS(statments[iff][2]).Equals(D.referenceS(statments[iff][3])))
+                                result = true;
+                            if (statments[iff][0] == "or" || statments[iff][0] == "nor")
                             {
-                                a = D.referenceSheet(D.referenceS(code[2]) + "#").typeidentifier;
+                                orsD = true;
+                            }
+                            if (result && statments[iff][0] == "or" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && statments[iff][0] == "nor" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && ands && statments[iff][0] == "and")
+                            {
+                                ands = false;
+                            }
+                            if (result && ands && statments[iff][0] == "not")
+                            {
+                                ands = false;
                             }
                         }
-                        else if (int.TryParse(code[2], out int ad))
+                        else if (statments[iff][1] == "typ")
                         {
-                            a = ad;
-                        }
-                        if (D.inint(code[3]))
-                        {
-                            b = D.referenceI(code[3]);
-                        }
-                        else if (D.issheet(code[3]))
-                        {
-                            b = D.referenceSheet(code[3]).typeidentifier;
-                        }
-                        else if (D.instring(code[3]))
-                        {
-                            if (D.issheet(D.referenceS(code[3]) + "#"))
+                            int a = 0;
+                            int b = -1;
+                            if (D.inint(statments[iff][2]))
                             {
-                                b = D.referenceSheet(D.referenceS(code[3]) + "#").typeidentifier;
+                                a = D.referenceI(statments[iff][2]);
+                            }
+                            else if (D.issheet(statments[iff][2]))
+                            {
+                                a = D.referenceSheet(statments[iff][2]).typeidentifier;
+                            }
+                            else if (D.instring(statments[iff][2]))
+                            {
+                                if (D.issheet(D.referenceS(statments[iff][2]) + "#"))
+                                {
+                                    a = D.referenceSheet(D.referenceS(statments[iff][2]) + "#").typeidentifier;
+                                }
+                            }
+                            else if (int.TryParse(statments[iff][2], out int ad))
+                            {
+                                a = ad;
+                            }
+                            if (D.inint(statments[iff][3]))
+                            {
+                                b = D.referenceI(statments[iff][3]);
+                            }
+                            else if (D.issheet(statments[iff][3]))
+                            {
+                                b = D.referenceSheet(statments[iff][3]).typeidentifier;
+                            }
+                            else if (D.instring(statments[iff][3]))
+                            {
+                                if (D.issheet(D.referenceS(statments[iff][3]) + "#"))
+                                {
+                                    b = D.referenceSheet(D.referenceS(statments[iff][3]) + "#").typeidentifier;
+                                }
+                            }
+                            else if (int.TryParse(statments[iff][3], out int bd))
+                            {
+                                b = bd;
+                            }
+                            if (b == a)
+                            {
+                                result = true;
+                            }
+                            if (statments[iff][0] == "or" || statments[iff][0] == "nor")
+                            {
+                                orsD = true;
+                            }
+                            if (result && statments[iff][0] == "or" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && statments[iff][0] == "nor" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && ands && statments[iff][0] == "and")
+                            {
+                                ands = false;
+                            }
+                            if (result && ands && statments[iff][0] == "not")
+                            {
+                                ands = false;
                             }
                         }
-                        else if (int.TryParse(code[3], out int bd))
+                        else if (statments[iff][1] == "ver")
                         {
-                            b = bd;
-                        }
-                        if (b == a)
-                        {
-                            result = true;
-                        }
-                    }
-                    else if (code[1] == "ver")
-                    {
-                        int a = 0;
-                        int b = -1;
-                        if (D.inint(code[2]))
-                        {
-                            a = D.referenceI(code[2]);
-                        }
-                        else if (D.issheet(code[2]))
-                        {
-                            a = D.referenceSheet(code[2]).identifier;
-                        }
-                        else if (D.instring(code[2]))
-                        {
-                            if (D.issheet(D.referenceS(code[2]) + "#"))
+                            int a = 0;
+                            int b = -1;
+                            if (D.inint(statments[iff][2]))
                             {
-                                a = D.referenceSheet(D.referenceS(code[2]) + "#").identifier;
+                                a = D.referenceI(statments[iff][2]);
+                            }
+                            else if (D.issheet(statments[iff][2]))
+                            {
+                                a = D.referenceSheet(statments[iff][2]).identifier;
+                            }
+                            else if (D.instring(statments[iff][2]))
+                            {
+                                if (D.issheet(D.referenceS(statments[iff][2]) + "#"))
+                                {
+                                    a = D.referenceSheet(D.referenceS(statments[iff][2]) + "#").identifier;
+                                }
+                            }
+                            else if (int.TryParse(statments[iff][2], out int ad))
+                            {
+                                a = ad;
+                            }
+                            if (D.inint(statments[iff][3]))
+                            {
+                                b = D.referenceI(statments[iff][3]);
+                            }
+                            else if (D.issheet(statments[iff][3]))
+                            {
+                                b = D.referenceSheet(statments[iff][3]).identifier;
+                            }
+                            else if (D.instring(statments[iff][3]))
+                            {
+                                if (D.issheet(D.referenceS(statments[iff][3]) + "#"))
+                                {
+                                    b = D.referenceSheet(D.referenceS(statments[iff][3]) + "#").identifier;
+                                }
+                            }
+                            else if (int.TryParse(statments[iff][3], out int bd))
+                            {
+                                b = bd;
+                            }
+                            if (b == a)
+                            {
+                                result = true;
+                            }
+                            if (statments[iff][0] == "or" || statments[iff][0] == "nor")
+                            {
+                                orsD = true;
+                            }
+                            if (result && statments[iff][0] == "or" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && statments[iff][0] == "nor" && !ors)
+                            {
+                                ors = true;
+                            }
+                            if (!result && ands && statments[iff][0] == "and")
+                            {
+                                ands = false;
+                            }
+                            if (result && ands && statments[iff][0] == "not")
+                            {
+                                ands = false;
                             }
                         }
-                        else if (int.TryParse(code[2], out int ad))
-                        {
-                            a = ad;
-                        }
-                        if (D.inint(code[3]))
-                        {
-                            b = D.referenceI(code[3]);
-                        }
-                        else if (D.issheet(code[3]))
-                        {
-                            b = D.referenceSheet(code[3]).identifier;
-                        }
-                        else if (D.instring(code[3]))
-                        {
-                            if (D.issheet(D.referenceS(code[3]) + "#"))
-                            {
-                                b = D.referenceSheet(D.referenceS(code[3]) + "#").identifier;
-                            }
-                        }
-                        else if (int.TryParse(code[3], out int bd))
-                        {
-                            b = bd;
-                        }
-                        if (b == a)
-                        {
-                            result = true;
-                        }
-                    }
 
-                    else
-                    {
-                        for (int i = 1; i < code.Count(); i++)
+                        else
                         {
-                            double j;
-                            if (Double.TryParse(code[i], out j))
+                            for (int i = 1; i < statments[iff].Count(); i++)
                             {
-                                equation += j + " ";
+                                double j;
+                                if (Double.TryParse(statments[iff][i], out j))
+                                {
+                                    equation += j + " ";
+                                }
+                                else if (statments[iff][i] == "+" || statments[iff][i] == "-" || statments[iff][i] == "/" || statments[iff][i] == "*" || statments[iff][i] == "sin" || statments[iff][i] == "cos" || statments[iff][i] == "tan" ||
+                                statments[iff][i] == "csc" || statments[iff][i] == "sec" || statments[iff][i] == "cot" || statments[iff][i] == "root" || statments[iff][i] == ")" || statments[iff][i] == "(" || statments[iff][i] == " " || statments[iff][i] == "==" || statments[iff][i] == "!=" || statments[iff][i] == ">" || statments[iff][i] == "<" ||
+                                statments[iff][i] == "=>" || statments[iff][i] == "=<" || statments[iff][i] == "!")
+                                {
+                                    equation += statments[iff][i] + " ";
+                                }
+                                else if (D.isnumvar(statments[iff][i]))
+                                {
+                                    equation += D.referenceVar(statments[iff][i]) + " ";
+                                }
+                                else
+                                {
+                                    equation += statments[iff][i] + " ";
+                                    //Debug.WriteLine("not recognized when statement");
+                                }
                             }
-                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                            code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " " || code[i] == "==" || code[i] == "!=" || code[i] == ">" || code[i] == "<" ||
-                            code[i] == "=>" || code[i] == "=<" || code[i] == "!")
+                            CalculationEngine engine = new CalculationEngine();
+                            result = Convert.ToBoolean(engine.Calculate(equation));
+                            //Console.WriteLine(result);
+
+                            if (statments[iff][0] == "or" || statments[iff][0] == "nor")
                             {
-                                equation += code[i] + " ";
+                                orsD = true;
                             }
-                            else if (D.isnumvar(code[i]))
+                            if (result && (statments[iff][0] == "or" && !ors))
                             {
-                                equation += D.referenceVar(code[i]) + " ";
+                                ors = true;
                             }
-                            else
+                            if (!result && (statments[iff][0] == "nor" && !ors))
                             {
-                                equation += code[i] + " ";
-                                //Debug.WriteLine("not recognized when statement");
+                                ors = true;
+                            }
+                            if (!result && (ands && statments[iff][0] == "and"))
+                            {
+                                ands = false;
+                            }
+                            if (result && (ands && statments[iff][0] == "not"))
+                            {
+                                ands = false;
                             }
                         }
-                        CalculationEngine engine = new CalculationEngine();
-                        result = Convert.ToBoolean(engine.Calculate(equation));
                     }
-                    if (!result)
+                }
+                    if (!orsD)
+                    {
+                        ors = true;
+                    }
+                if (ors && ands)
+                    endresult = true;
+
+                    if (!endresult)
                     {
                         int w = 0;
                         int q = Base.position + 1;
@@ -1110,7 +1237,6 @@ namespace jumpE_basic
                         
                     }
 
-                }
                 /*catch
                 {
                     Console.WriteLine("Error: 10, logic statement error, Line "+ Base.position);
