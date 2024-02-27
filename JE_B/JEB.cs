@@ -796,7 +796,7 @@ namespace jumpE_basic
                 }
                 else if (D.isvar(code[2]))
                 {
-                    D.save_specific_var(code[2], code[1]);
+                    D.save_specific_var(code[2]+".txt", code[1]);
                 }
                 
 
