@@ -438,6 +438,7 @@ namespace jumpE_basic
                 commands.Add("Function", new Function_func(Math_equation, this));
                 commands.Add("bringDL", new bringDL());
                 commands.Add("HS", new Hard_stop());
+                commands.Add("save", new save());
                 // list all commands here :
                 // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function, bringDL, HS, 
                 // list all commands that refer to sheets here : 
@@ -594,12 +595,6 @@ namespace jumpE_basic
                         {
                             Console.WriteLine();
                         }
-                        /*else if (code[i] == "\\Color")
-                        {
-                            Console.Writeint.Parse(code[i + 1]));
-                            
-                            i++;
-                        }*/
                         else if (code[i] == "\"" && code[i + 2] == "\"")
                         {
                             Message += (D.referenceVar(code[i + 1]));
@@ -660,6 +655,8 @@ namespace jumpE_basic
                             if(kk==16)
                                 Console.ForegroundColor = ConsoleColor.White;
                             i++;
+                            Console.Write(Message);
+                            Message = "";
                         }
                         else if (code[i] == "|~|")
                         {
@@ -707,6 +704,8 @@ namespace jumpE_basic
                             if (kk == 16)
                                 Console.BackgroundColor = ConsoleColor.White;
                             i++;
+                            Console.Write(Message);
+                            Message = "";
                         }
                         else if (code[i] == "M#"&& code[i+1] == "#" )
                         {
@@ -742,7 +741,7 @@ namespace jumpE_basic
                         }
 
                     }
-                    Console.WriteLine(Message);
+                    Console.Write(Message);
                 }
                 catch
                 {
@@ -778,6 +777,44 @@ namespace jumpE_basic
                 else
                 {
                     D.typeidentifier = int.Parse(code[1]);
+                }
+            }
+        }
+        public class save : command_centrall
+        {
+            public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
+            {
+                // save to file named at code[1]
+                // if code[2] == "all" save all data
+                // if code[2] = a variable save that variable
+                // addd on the txt extension
+                // the format for the save is as follows
+                // variable name : variable value : variable type
+                if (code[2]== "all")
+                {
+                    D.SaveToFile(code[2]+".txt");
+                }
+                else if (D.isvar(code[2]))
+                {
+                    D.save_specific_var(code[2], code[1]);
+                }
+                
+
+            }
+        }
+        public class read : command_centrall
+        {
+            public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
+            {
+                // read from file named at code[1]
+                // if code[2] == "all" read all data
+                // if code[2] = a variable read that variable
+                // addd on the txt extension
+                // the format for the save is as follows
+                // variable name : variable value : variable type
+                if (code[2] == "all")
+                {
+                    D.ReadFromFile(code[2] + ".txt");
                 }
             }
         }

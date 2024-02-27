@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -106,17 +107,98 @@ namespace DATA_CONVERTER
         }
         public void SaveToFile(string filePath)
         {
-            string stringsData = DictionaryToString(strings);
-            string doublesData = DictionaryToString(doubles);
-            File.WriteAllText(filePath, stringsData + Environment.NewLine + doublesData);
+            //put a | between each variable
+            string stringsData = DictionaryToString(strings,"string");
+            string doublesData = DictionaryToString(doubles,"double");
+            string integersData = DictionaryToString(integers,"int");
+            string customData = DictionaryToString(custom_types,"custom");
+            string linesData = DictionaryToString(lines,"line");
+            string functionsData = DictionaryToString(functions,"function");
+            string filesData = DictionaryToString(files,"file");
+            string sheetsData = "";
+            foreach (var kvp in sheets)
+            {
+                sheetsData += kvp.Key + "=" + kvp.Value.identifier + Environment.NewLine;
+                kvp.Value.SaveToFile(filePath + "_" + kvp.Key);
+            }
+            File.WriteAllText(filePath, stringsData + Environment.NewLine + doublesData + Environment.NewLine + integersData + Environment.NewLine + customData + Environment.NewLine + linesData + Environment.NewLine + functionsData + Environment.NewLine + filesData + Environment.NewLine + sheetsData);
+        }
+        public void save_specific_var(string key, string path)
+        {
+            //check type of var and save it to file
+            // saves as follows
+            // variable name : variable value : variable type
+            if (strings.ContainsKey(key))
+            {
+                File.WriteAllText(path, strings[key]);
+            }
+            else if (doubles.ContainsKey(key))
+            {
+                File.WriteAllText(path, doubles[key]+"");
+            }
+            else if (integers.ContainsKey(key))
+            {
+                File.WriteAllText(path, integers[key] + "");
+            }
+            else if (sheets.ContainsKey(key))
+            {
+                sheets[key].SaveToFile(path);
+            }
+            /*else if (custom_types.ContainsKey(key))
+            {
+                File.WriteAllText(path, DictionaryToString(custom_types[key]) + ":custom|");
+            }*/
+            else if (lines.ContainsKey(key))
+            {
+                File.WriteAllText(path, lines[key].get_line_number() + "");
+            }
+            else if (functions.ContainsKey(key))
+            {
+                File.WriteAllText(path, functions[key].get_start_int() + ":" + functions[key].get_end_int() + "");
+            }
+            else if (files.ContainsKey(key))
+            {
+                File.WriteAllText(path, files[key].get_file_path());
+            }
+        }
+        public void StringToDictionary<T>(string data, Dictionary<string, T> dictionary)
+        {
+            string[] keyValuePairs = data.Split('|');
+            foreach (string pair in keyValuePairs)
+            {
+                string[] parts = pair.Split('=');
+                string key = parts[0];
+                T value = (T)Convert.ChangeType(parts[1], typeof(T));
+                dictionary.Add(key, value);
+            }
+        }
+        public void ReadFromFile(string filePath)
+        {
+            string[] liness = File.ReadAllLines(filePath);
+            StringToDictionary(liness[0], strings);
+            StringToDictionary(liness[1], doubles);
+            StringToDictionary(liness[2], integers);
+            StringToDictionary(liness[3], custom_types);
+            StringToDictionary(liness[4], lines);
+            StringToDictionary(liness[5], functions);
+            StringToDictionary(liness[6], files);
+            for (int i = 7; i < liness.Length; i++)
+            {
+                string[] parts = liness[i].Split('=');
+                string key = parts[0];
+                int value = int.Parse(parts[1]);
+                Data d = new Data();
+                d.ReadFromFile(filePath + "_" + key);
+                sheets.Add(key, d);
+            }
         }
 
-        private static string DictionaryToString<T>(Dictionary<string, T> dictionary)
+        private static string DictionaryToString<T>(Dictionary<string, T> dictionary,string type)
         {
             List<string> keyValuePairs = new List<string>();
             foreach (var kvp in dictionary)
             {
-                keyValuePairs.Add($"{kvp.Key}={kvp.Value}");
+                keyValuePairs.Add($"{kvp.Key}={kvp.Value} " + ":"+type+"|");
             }
             return string.Join(Environment.NewLine, keyValuePairs);
         }
