@@ -21,6 +21,7 @@ using System.Runtime.InteropServices;
 using jumpE_basic;
 using static System.Net.Mime.MediaTypeNames;
 using System.Net.Mail;
+using static jumpE_basic.base_runner;
 
 namespace jumpE_basic
 {
@@ -575,6 +576,7 @@ namespace jumpE_basic
         }
         public class print : command_centrall
         {
+            
             public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
             {
                 try
@@ -611,6 +613,128 @@ namespace jumpE_basic
                         else if(code[i] == "\\!S!")
                         {
                             Message += "!S!";
+                        }
+                        else if (code[i] == "~|~")
+                        {
+                            int kk = 0;
+                            if (D.isnumvar(code[i+1]))
+                            {
+                                kk += (int) D.referenceVar(code[i+1]);
+                            }
+                            else
+                            {
+                                kk += int.Parse(code[i+1]);
+                            }
+                            if(kk==0)
+                                Console.ResetColor();
+                            if(kk==1)
+                                Console.ForegroundColor = ConsoleColor.Black;
+                            if(kk==2)
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                            if(kk==3)
+                                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            if(kk==4)
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                            if(kk==5)
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                            if(kk==6)
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                            if(kk==7)
+                                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            if(kk==8)
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                            if(kk==9)
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                            if(kk==10)
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                            if(kk==11)
+                                Console.ForegroundColor = ConsoleColor.Green;
+                            if(kk==12)
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                            if(kk==13)
+                                Console.ForegroundColor = ConsoleColor.Red;
+                            if(kk==14)
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                            if(kk==15)
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                            if(kk==16)
+                                Console.ForegroundColor = ConsoleColor.White;
+                            i++;
+                        }
+                        else if (code[i] == "|~|")
+                        {
+                            int kk = 0;
+                            if (D.isnumvar(code[i + 1]))
+                            {
+                                kk += (int)D.referenceVar(code[i + 1]);
+                            }
+                            else
+                            {
+                                kk += int.Parse(code[i + 1]);
+                            }
+                            if (kk == 0)
+                                Console.ResetColor();
+                            if (kk == 1)
+                                Console.BackgroundColor = ConsoleColor.Black;
+                            if (kk == 2)
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;
+                            if (kk == 3)
+                                Console.BackgroundColor = ConsoleColor.DarkGreen;
+                            if (kk == 4)
+                                Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            if (kk == 5)
+                                Console.BackgroundColor = ConsoleColor.DarkRed;
+                            if (kk == 6)
+                                Console.BackgroundColor = ConsoleColor.DarkMagenta;
+                            if (kk == 7)
+                                Console.BackgroundColor = ConsoleColor.DarkYellow;
+                            if (kk == 8)
+                                Console.BackgroundColor = ConsoleColor.Gray;
+                            if (kk == 9)
+                                Console.BackgroundColor = ConsoleColor.DarkGray;
+                            if (kk == 10)
+                                Console.BackgroundColor = ConsoleColor.Blue;
+                            if (kk == 11)
+                                Console.BackgroundColor = ConsoleColor.Green;
+                            if (kk == 12)
+                                Console.BackgroundColor = ConsoleColor.Cyan;
+                            if (kk == 13)
+                                Console.BackgroundColor = ConsoleColor.Red;
+                            if (kk == 14)
+                                Console.BackgroundColor = ConsoleColor.Magenta;
+                            if (kk == 15)
+                                Console.BackgroundColor = ConsoleColor.Yellow;
+                            if (kk == 16)
+                                Console.BackgroundColor = ConsoleColor.White;
+                            i++;
+                        }
+                        else if (code[i] == "M#"&& code[i+1] == "#" )
+                        {
+                            string equation = "";
+                            for(int ll = i; ll < code.Count; ll++)
+                            {
+                                if (code[ll] == "#" && code[ll+1]=="#M")
+                                {
+                                    i = ll+1;
+                                    break;
+                                }
+                                double j;
+                                if (Double.TryParse(code[ll], out j))
+                                {
+                                    equation += j + " ";
+                                }
+                                else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
+                                code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
+                                {
+                                    equation += code[ll] + " ";
+                                }
+                                else if (D.isnumvar(code[ll]))
+                                {
+                                    equation += D.referenceVar(code[ll]) + " ";
+                                }
+                            }
+                            CalculationEngine engine = new CalculationEngine();
+                            Message += engine.Calculate(equation);
                         }
                         else
                         {
@@ -2102,6 +2226,34 @@ namespace Imported_commands
                             {
                                 mesage += " ";
                             }
+                            else if (code[i] == "M#" && code[i + 1] == "#")
+                            {
+                                string equation = "";
+                                for (int ll = i; ll < code.Count; ll++)
+                                {
+                                    if (code[ll] == "#" && code[ll + 1] == "#M")
+                                    {
+                                        i = ll + 1;
+                                        break;
+                                    }
+                                    double j;
+                                    if (Double.TryParse(code[ll], out j))
+                                    {
+                                        equation += j + " ";
+                                    }
+                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
+                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
+                                    {
+                                        equation += code[ll] + " ";
+                                    }
+                                    else if (D.isnumvar(code[ll]))
+                                    {
+                                        equation += D.referenceVar(code[ll]) + " ";
+                                    }
+                                }
+                                CalculationEngine engine = new CalculationEngine();
+                                mesage += engine.Calculate(equation);
+                            }
                             else
                             {
                                 mesage += code[i];
@@ -2121,6 +2273,34 @@ namespace Imported_commands
                             else if (code[i] == "!S!")
                             {
                                 mesage += " ";
+                            }
+                            else if (code[i] == "M#" && code[i + 1] == "#")
+                            {
+                                string equation = "";
+                                for (int ll = i; ll < code.Count; ll++)
+                                {
+                                    if (code[ll] == "#" && code[ll + 1] == "#M")
+                                    {
+                                        i = ll + 1;
+                                        break;
+                                    }
+                                    double j;
+                                    if (Double.TryParse(code[ll], out j))
+                                    {
+                                        equation += j + " ";
+                                    }
+                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
+                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
+                                    {
+                                        equation += code[ll] + " ";
+                                    }
+                                    else if (D.isnumvar(code[ll]))
+                                    {
+                                        equation += D.referenceVar(code[ll]) + " ";
+                                    }
+                                }
+                                CalculationEngine engine = new CalculationEngine();
+                                mesage += engine.Calculate(equation);
                             }
                             else
                             {
@@ -2278,6 +2458,34 @@ namespace Imported_commands
                             else if (code[i] == "!S!")
                             {
                                 mesage += " ";
+                            }
+                            else if (code[i] == "M#" && code[i + 1] == "#")
+                            {
+                                string equation = "";
+                                for (int ll = i; ll < code.Count; ll++)
+                                {
+                                    if (code[ll] == "#" && code[ll + 1] == "#M")
+                                    {
+                                        i = ll + 1;
+                                        break;
+                                    }
+                                    double j;
+                                    if (Double.TryParse(code[ll], out j))
+                                    {
+                                        equation += j + " ";
+                                    }
+                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
+                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
+                                    {
+                                        equation += code[ll] + " ";
+                                    }
+                                    else if (D.isnumvar(code[ll]))
+                                    {
+                                        equation += D.referenceVar(code[ll]) + " ";
+                                    }
+                                }
+                                CalculationEngine engine = new CalculationEngine();
+                                mesage += engine.Calculate(equation);
                             }
                             else
                             {
