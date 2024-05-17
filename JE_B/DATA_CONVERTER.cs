@@ -726,4 +726,9 @@ namespace DATA_CONVERTER
         }
         partial void Execute();
     }
+    public class Method
+    { 
+        // ading in a true methods to the language
+
+    }
 }
