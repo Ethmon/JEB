@@ -22,6 +22,7 @@ using jumpE_basic;
 using static System.Net.Mime.MediaTypeNames;
 using System.Net.Mail;
 using static jumpE_basic.base_runner;
+using System.Runtime.CompilerServices;
 
 namespace jumpE_basic
 {
@@ -221,23 +222,23 @@ namespace jumpE_basic
             this.taken_in_string = taken;
             this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
             this.position = 0;
-            this.run = true; 
+            this.run = true;
             datas.Add(data);
             data.setI("LNT", 0);
 
             while (this.run)
             {
-                if(debg)
+                if (debg)
                 {
                     Console.WriteLine(lines[position] + "   " + real_count);
                     Console.ReadLine();
 
                 }
-                if(hard_stop)
+                if (hard_stop)
                 {
                     this.run = false;
                     break;
-                    
+
                 }
                 //try
                 {
@@ -252,16 +253,16 @@ namespace jumpE_basic
                     interorouter = commandRegistry.GetCommandDefinition(this.code[0]);
                     if (interorouter is command_centrall)
                     {
-                        ((command_centrall)(interorouter)).Execute(this.code, datas[datas.Count()-1], this);
+                        ((command_centrall)(interorouter)).Execute(this.code, datas[datas.Count() - 1], this);
                     }
                     if (interorouter is outer_commands)
                     {
                         ((outer_commands)(interorouter)).Execute(this.code, datas[datas.Count() - 1]);
                     }
-                    
+
 
                 }
-                else if (datas[datas.Count() - 1].isvar(this.code[0]) && !(lines[position] == "{" || lines[position]=="}" || code[0] == "<<" || code[0]==">>"))
+                else if (datas[datas.Count() - 1].isvar(this.code[0]) && !(lines[position] == "{" || lines[position] == "}" || code[0] == "<<" || code[0] == ">>"))
                 {
                     f.Execute(this.code, datas[datas.Count() - 1], this);
                 }
@@ -307,7 +308,7 @@ namespace jumpE_basic
             public static List<string> Linizer(string input)
             {
                 List<string> words = new List<string>();
-                string[] lines = input.Split(new char[] { '\n', ';','\r' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = input.Split(new char[] { '\n', ';', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string line in lines)
                 {
@@ -429,9 +430,9 @@ namespace jumpE_basic
                 commands.Add("IDD", new IDD()); commands.Add("IDT", new IDT());
                 commands.Add("free", new free());
                 commands.Add("skip", new Skip());
-                commands.Add("sideLayer", sideLayer);commands.Add("remL", new remL());commands.Add("callLayer", callLy);commands.Add("bring", new bring());
+                commands.Add("sideLayer", sideLayer); commands.Add("remL", new remL()); commands.Add("callLayer", callLy); commands.Add("bring", new bring());
                 commands.Add("raiseS", new raiseS()); commands.Add("raiseSA", new raiseSA());
-                commands.Add("bringA", new bringA()); commands.Add("pushA",new pushA());
+                commands.Add("bringA", new bringA()); commands.Add("pushA", new pushA());
                 commands.Add("pushDL", new pushDL());
                 commands.Add("Line", new Line_func(Math_equation, this));
                 commands.Add("File", new File_func());
@@ -439,6 +440,7 @@ namespace jumpE_basic
                 commands.Add("bringDL", new bringDL());
                 commands.Add("HS", new Hard_stop());
                 commands.Add("save", new save());
+                commands.Add("method", new Method_instantiate());
                 // list all commands here :
                 // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function, bringDL, HS, 
                 // list all commands that refer to sheets here : 
@@ -487,6 +489,7 @@ namespace jumpE_basic
                     return false;
                 }
             }
+
             public command_centralls GetCommandDefinition(string commandName)
             {
                 if (ContainsCommand(commandName))
@@ -577,7 +580,7 @@ namespace jumpE_basic
         }
         public class print : command_centrall
         {
-            
+
             public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
             {
                 try
@@ -605,54 +608,54 @@ namespace jumpE_basic
                         {
                             Message += " ";
                         }
-                        else if(code[i] == "\\!S!")
+                        else if (code[i] == "\\!S!")
                         {
                             Message += "!S!";
                         }
                         else if (code[i] == "~|~")
                         {
                             int kk = 0;
-                            if (D.isnumvar(code[i+1]))
+                            if (D.isnumvar(code[i + 1]))
                             {
-                                kk += (int) D.referenceVar(code[i+1]);
+                                kk += (int)D.referenceVar(code[i + 1]);
                             }
                             else
                             {
-                                kk += int.Parse(code[i+1]);
+                                kk += int.Parse(code[i + 1]);
                             }
-                            if(kk==0)
+                            if (kk == 0)
                                 Console.ResetColor();
-                            if(kk==1)
+                            if (kk == 1)
                                 Console.ForegroundColor = ConsoleColor.Black;
-                            if(kk==2)
+                            if (kk == 2)
                                 Console.ForegroundColor = ConsoleColor.DarkBlue;
-                            if(kk==3)
+                            if (kk == 3)
                                 Console.ForegroundColor = ConsoleColor.DarkGreen;
-                            if(kk==4)
+                            if (kk == 4)
                                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                            if(kk==5)
+                            if (kk == 5)
                                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                            if(kk==6)
+                            if (kk == 6)
                                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                            if(kk==7)
+                            if (kk == 7)
                                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                            if(kk==8)
+                            if (kk == 8)
                                 Console.ForegroundColor = ConsoleColor.Gray;
-                            if(kk==9)
+                            if (kk == 9)
                                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                            if(kk==10)
+                            if (kk == 10)
                                 Console.ForegroundColor = ConsoleColor.Blue;
-                            if(kk==11)
+                            if (kk == 11)
                                 Console.ForegroundColor = ConsoleColor.Green;
-                            if(kk==12)
+                            if (kk == 12)
                                 Console.ForegroundColor = ConsoleColor.Cyan;
-                            if(kk==13)
+                            if (kk == 13)
                                 Console.ForegroundColor = ConsoleColor.Red;
-                            if(kk==14)
+                            if (kk == 14)
                                 Console.ForegroundColor = ConsoleColor.Magenta;
-                            if(kk==15)
+                            if (kk == 15)
                                 Console.ForegroundColor = ConsoleColor.Yellow;
-                            if(kk==16)
+                            if (kk == 16)
                                 Console.ForegroundColor = ConsoleColor.White;
                             i++;
                             Console.Write(Message);
@@ -707,14 +710,14 @@ namespace jumpE_basic
                             Console.Write(Message);
                             Message = "";
                         }
-                        else if (code[i] == "M#"&& code[i+1] == "#" )
+                        else if (code[i] == "M#" && code[i + 1] == "#")
                         {
                             string equation = "";
-                            for(int ll = i; ll < code.Count; ll++)
+                            for (int ll = i; ll < code.Count; ll++)
                             {
-                                if (code[ll] == "#" && code[ll+1]=="#M")
+                                if (code[ll] == "#" && code[ll + 1] == "#M")
                                 {
-                                    i = ll+1;
+                                    i = ll + 1;
                                     break;
                                 }
                                 double j;
@@ -745,7 +748,7 @@ namespace jumpE_basic
                 }
                 catch
                 {
-                    Console.WriteLine("Error: printing error, Line "+Base.position);
+                    Console.WriteLine("Error: printing error, Line " + Base.position);
                 }
 
 
@@ -790,15 +793,15 @@ namespace jumpE_basic
                 // addd on the txt extension
                 // the format for the save is as follows
                 // variable name : variable value : variable type
-                if (code[2]== "all")
+                if (code[2] == "all")
                 {
-                    D.SaveToFile(code[2]+".txt");
+                    D.SaveToFile(code[2] + ".txt");
                 }
                 else if (D.isvar(code[2]))
                 {
-                    D.save_specific_var(code[2]+".txt", code[1]);
+                    D.save_specific_var(code[2] + ".txt", code[1]);
                 }
-                
+
 
             }
         }
@@ -823,15 +826,15 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 //try
-                    /*if (Base.commandRegistry.ContainsCommand(code[1]))
-                    {
-                        Base.commandRegistry.commands.Remove(code[1]);
-                        
-                    }*/
-                    if (D.isvar(code[1]))
+                /*if (Base.commandRegistry.ContainsCommand(code[1]))
+                {
+                    Base.commandRegistry.commands.Remove(code[1]);
+
+                }*/
+                if (D.isvar(code[1]))
                 {
                     D.remove(code[1]);
-                    }
+                }
                 //} catch { Console.WriteLine("Error: 4, Unable to Free, Line"+Base.position); }
             }
         }
@@ -840,7 +843,7 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 Base.datas.Add(D.Copy());
-                
+
             }
         }
         public class raiseS : command_centrall
@@ -879,37 +882,37 @@ namespace jumpE_basic
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 Data datas = new Data();
-                for (int i = 1; i < code.Count; i+=2)
+                for (int i = 1; i < code.Count; i += 2)
                 {
                     if (D.isvar(code[i]))
                     {
                         if (D.inint(code[i]))
                         {
-                            datas.setI(code[i+1], D.referenceI(code[i]));
+                            datas.setI(code[i + 1], D.referenceI(code[i]));
                         }
                         else if (D.indouble(code[i]))
                         {
-                            datas.setD(code[i+1], D.referenceD(code[i]));
+                            datas.setD(code[i + 1], D.referenceD(code[i]));
                         }
                         else if (D.instring(code[i]))
                         {
-                            datas.setS(code[i+1], D.referenceS(code[i]));
+                            datas.setS(code[i + 1], D.referenceS(code[i]));
                         }
                         else if (D.issheet(code[i]))
                         {
-                            datas.setsheet(code[i+1], D.referenceSheet(code[i]));
+                            datas.setsheet(code[i + 1], D.referenceSheet(code[i]));
                         }
                     }
-                    if(int.TryParse(code[i], out int ad))
+                    if (int.TryParse(code[i], out int ad))
                     {
-                        if(ad == double.Parse(code[i]))
+                        if (ad == double.Parse(code[i]))
                         {
                             datas.setI(code[i + 1], ad);
                         }
                         else
                         {
                             datas.setD(code[i + 1], double.Parse(code[i]));
-                        }   
+                        }
                     }
                 }
                 Base.datas.Add(datas);
@@ -918,7 +921,7 @@ namespace jumpE_basic
         }
 
         public class sideLayer : command_centrall
-        {             
+        {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 //try
@@ -953,13 +956,13 @@ namespace jumpE_basic
                 }
             }
         }
-        public class  callLayer : command_centrall
+        public class callLayer : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
                 if (code[1] == "\"" && code[3] == "\"")
                 {
-                    Base.datas.Add(D.referenceSheet(D.referenceS(code[2])+ "#"));
+                    Base.datas.Add(D.referenceSheet(D.referenceS(code[2]) + "#"));
                 }
                 else if (D.issheet(code[1]))
                 {
@@ -993,7 +996,7 @@ namespace jumpE_basic
                     D.setsheet(code[1], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
                 }
                 //adding lines functions and files
-                
+
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
@@ -1040,11 +1043,17 @@ namespace jumpE_basic
             //pre_defined_variable f = new pre_defined_variable();
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (D.inint(code[1])) { Base.datas[Base.datas.Count() - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                if (D.inint(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
                 }
-                else if (D.indouble(code[1])) { Base.datas[Base.datas.Count() - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
+                else if (D.indouble(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
                 }
-                else if (D.instring(code[1])) { Base.datas[Base.datas.Count() - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
+                else if (D.instring(code[1]))
+                {
+                    Base.datas[Base.datas.Count() - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
                 }
                 else if (D.issheet(code[1]))
                 {
@@ -1091,7 +1100,7 @@ namespace jumpE_basic
             {
                 if (D.instring(code[1]))
                 {
-                    if (D.issheet(D.referenceS(code[1]+"#")))
+                    if (D.issheet(D.referenceS(code[1] + "#")))
                     {
                         Base.datas[Base.datas.Count() - 2].setsheet(D.referenceS(code[1] + "#"), D);
                         return;
@@ -1124,7 +1133,7 @@ namespace jumpE_basic
             }
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                
+
                 bool ors = false;
                 bool ands = true;
                 bool orsD = false;
@@ -1359,44 +1368,44 @@ namespace jumpE_basic
                         }
                     }
                 }
-                    if (!orsD)
-                    {
-                        ors = true;
-                    }
+                if (!orsD)
+                {
+                    ors = true;
+                }
                 if (ors && ands)
                     endresult = true;
 
-                    if (!endresult)
+                if (!endresult)
+                {
+                    int w = 0;
+                    int q = Base.position + 1;
+                    while (true)
                     {
-                        int w = 0;
-                        int q = Base.position + 1;
-                        while (true)
+
+
+                        if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "{")
                         {
-
-
-                            if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "{")
-                            {
-                                w++;
-                            }
-                            if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "}")
-                            {
-                                if (w == 1)
-                                {
-                                    Base.changePosition(q);
-                                    break;
-                                }
-                                else if (w != 0)
-                                {
-                                    w--;
-                                }
-                            }
-                            q++;
+                            w++;
                         }
+                        if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "}")
+                        {
+                            if (w == 1)
+                            {
+                                Base.changePosition(q);
+                                break;
+                            }
+                            else if (w != 0)
+                            {
+                                w--;
+                            }
+                        }
+                        q++;
                     }
-                    else
-                    {
-                        
-                    }
+                }
+                else
+                {
+
+                }
 
                 /*catch
                 {
@@ -1793,7 +1802,7 @@ namespace Imported_commands
         }
         public class Line_func : command_centrall
         {
-                        //pre_defined_variable Math_equation;
+            //pre_defined_variable Math_equation;
             CommandRegistry commands;
             IDictionary<string, double> drict = new Dictionary<string, double>();
             public Line_func(pre_defined_variable j, CommandRegistry c)
@@ -1804,7 +1813,7 @@ namespace Imported_commands
             }
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                
+
                 try
                 {
                     string equation = "";
@@ -1834,7 +1843,7 @@ namespace Imported_commands
                             }
                         }
                         CalculationEngine engine = new CalculationEngine();
-                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)),D);
+                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)), D);
                         D.setLine(code[1], u);
                     }
 
@@ -1932,7 +1941,7 @@ namespace Imported_commands
             {
                 if (code.Count() == 3)
                 {
-                    D.setFile(code[1],new file (code[2], D));
+                    D.setFile(code[1], new file(code[2], D));
                 }
                 else if (code.Count() == 4)
                 {
@@ -1942,7 +1951,7 @@ namespace Imported_commands
                     }
                     else if (D.instring(code[3]))
                     {
-                        if (D.issheet(D.referenceS(code[3]+"#")))
+                        if (D.issheet(D.referenceS(code[3] + "#")))
                         {
                             D.setFile(code[1], new file(code[2], D.referenceSheet(D.referenceS(code[3] + "#"))));
                         }
@@ -2350,17 +2359,17 @@ namespace Imported_commands
                 }
                 if (D.isLine(code[0]))
                 {
-                    
-                    if(code.Count == 1)
+
+                    if (code.Count == 1)
                     {
                         D.referenceLine(code[0]).uses();
                     }
-                    else if (code[1]=="inst")
+                    else if (code[1] == "inst")
                     {
-                        
+
                         D.referenceLine(code[0]).set_line_string(Base.lines[D.referenceLine(code[0]).get_line_number()] + "\nend");
                     }
-                    else if (code[1]== "=")
+                    else if (code[1] == "=")
                     {
                         if (D.isLine(code[2]))
                         {
@@ -2402,7 +2411,7 @@ namespace Imported_commands
                             D.referenceFunction(code[0]).Setfunction_string(mesage);
                         }
                     }
-                    else if (code[1]=="=")
+                    else if (code[1] == "=")
                     {
                         if (D.issheet(code[2]))
                         {
@@ -2410,13 +2419,13 @@ namespace Imported_commands
                         }
                         else if (D.instring(code[2]))
                         {
-                            if (D.issheet(D.referenceS(code[2])+"#"))
+                            if (D.issheet(D.referenceS(code[2]) + "#"))
                             {
-                                D.referenceFunction(code[0]).change_acsesed_data(D.referenceSheet(D.referenceS(code[2])+"#"));
+                                D.referenceFunction(code[0]).change_acsesed_data(D.referenceSheet(D.referenceS(code[2]) + "#"));
                             }
                         }
                     }
-                    
+
                 }
                 if (D.isFile(code[0]))
                 {
@@ -2426,24 +2435,24 @@ namespace Imported_commands
                     }
                     else if (code.Count == 2)
                     {
-                        if (code[1]=="inst")
+                        if (code[1] == "inst")
 
-                        try
-                        {
-                            string fileName = @"" + D.referenceFile(code[0]).get_file_path();
-                            using (StreamReader streamReader = File.OpenText(fileName))
+                            try
                             {
-                                string text = streamReader.ReadToEnd();
-                                D.referenceFile(code[0]).set_context(text);
+                                string fileName = @"" + D.referenceFile(code[0]).get_file_path();
+                                using (StreamReader streamReader = File.OpenText(fileName))
+                                {
+                                    string text = streamReader.ReadToEnd();
+                                    D.referenceFile(code[0]).set_context(text);
+                                }
+
                             }
-                            
-                        }
-                        catch
-                        {
-                            Console.WriteLine("File not found");
-                        }
+                            catch
+                            {
+                                Console.WriteLine("File not found");
+                            }
                     }
-                    
+
                     else if (code[1] == "=")
                     {
                         if (D.issheet(code[2]))
@@ -2535,7 +2544,7 @@ namespace Imported_commands
                         {
                             Base.commandRegistry.add_command(code[1], this.varlee);
                         }*/
-                        
+
 
                     }
                 }
@@ -2590,7 +2599,7 @@ namespace Imported_commands
                         {
                             Base.commandRegistry.add_command(code[1], this.Math_equation);
                         }*/
-                        
+
                     }
 
                 }
@@ -2636,13 +2645,13 @@ namespace Imported_commands
                     }
                     else if (code[1] == ">>")
                     {
-                        
+
                         foreach (string i in Base.lines)
                         {
                             //Console.WriteLine(i);Console.WriteLine(">> " + code[2]);
-                            if (SimpleTokenizer.no_tab_spaces(i)==">>" + code[2])
+                            if (SimpleTokenizer.no_tab_spaces(i) == ">>" + code[2])
                             {
-                                
+
                                 //D.setI(code[2], Base.get_position());
                                 Base.positions.Add(Base.get_position());
                                 Base.changePosition(Base.lines.IndexOf(i));
@@ -2651,7 +2660,7 @@ namespace Imported_commands
                             }
                         }
                     }
-                    
+
                 }
                 catch (Exception e)
                 {
@@ -2724,10 +2733,68 @@ namespace Imported_commands
             }
 
         }*/
-        
 
+
+
+        public class Method_instantiate : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                int w = 0;
+                int q = Base.position + 1;
+                List<String> args = new List<String>();
+                while (true)
+                {
+                    args.Add(Base.lines[q]);
+
+                    if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "{")
+                    {
+                        w++;
+                    }
+                    if (SimpleTokenizer.no_tab_spaces(Base.lines[q]) == "}")
+                    {
+                        if (w == 1)
+                        {
+                            Base.changePosition(q);
+                            break;
+                        }
+                        else if (w != 0)
+                        {
+                            w--;
+                        }
+                    }
+                    q++;
+                }
+                Type t = getType(code[1]);
+                Dictionary<string,Object> list = new Dictionary<string,Object>();
+                for(int i = 4; i< code.Count; i+=2)
+                {
+                    list.Add(code[i-1], getType(code[i]));
+                }   
+
+                D.setMethod(code[1], args.ToArray(), t, list);
+
+            }
+        }
+        
+        public static Type getType(string type)
+        {
+            switch (type)
+            {
+                case ("int"):
+                    return typeof(int);
+                case ("double"):
+                    return typeof(double);
+                case ("string"):
+                    return typeof(string);
+                case ("sheet"):
+                    return typeof(Data);
+                default:
+                    return typeof(void);
+            }
+        }
     }
-    
+
 
 
 }

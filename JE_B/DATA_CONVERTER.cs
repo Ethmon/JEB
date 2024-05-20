@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Resources;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -36,6 +37,7 @@ namespace DATA_CONVERTER
         Dictionary<string, Line> lines = new Dictionary<string, Line>();
         Dictionary<string, Function> functions = new Dictionary<string, Function>();
         Dictionary<string, file> files = new Dictionary<string, file>();
+        Dictionary<string, Method> methods = new Dictionary<string, Method>();
         
         Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
         public int identifier = 0;
@@ -50,6 +52,14 @@ namespace DATA_CONVERTER
             {
                 throw new ArgumentException(key + " not initiallized");
             }
+        }
+        public bool CheckifNotInitiallized(string key)
+        {
+            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key) || methods.ContainsKey(key))
+            {
+                return false;
+            }
+            return true;
         }
         public void remove(string key)
         {
@@ -148,18 +158,18 @@ namespace DATA_CONVERTER
             {
                 File.WriteAllText(path, DictionaryToString(custom_types[key]) + ":custom|");
             }*/
-            else if (lines.ContainsKey(key))
-            {
-                File.WriteAllText(path, lines[key].get_line_number() + "");
-            }
-            else if (functions.ContainsKey(key))
-            {
-                File.WriteAllText(path, functions[key].get_start_int() + ":" + functions[key].get_end_int() + "");
-            }
-            else if (files.ContainsKey(key))
-            {
-                File.WriteAllText(path, files[key].get_file_path());
-            }
+            //else if (lines.ContainsKey(key))
+            //{
+            //    File.WriteAllText(path, lines[key].get_line_number() + "");
+            //}
+            //else if (functions.ContainsKey(key))
+            //{
+            //    File.WriteAllText(path, functions[key].get_start_int() + ":" + functions[key].get_end_int() + "");
+            //}
+            //else if (files.ContainsKey(key))
+            //{
+            //    File.WriteAllText(path, files[key].get_file_path());
+            //}
         }
         public void StringToDictionary<T>(string data, Dictionary<string, T> dictionary)
         {
@@ -579,6 +589,32 @@ namespace DATA_CONVERTER
             }
         }
 
+
+
+
+
+
+
+
+
+
+        public void setMethod(string key, String[] lines, Type Ty, Dictionary<string,Object> para)
+        {
+            if(CheckifNotInitiallized(key))
+            {
+                methods.Add(key, new Method(lines, Ty, para));
+            }
+        }
+        public Method referenceMethod(string key)
+        {
+            if(methods.ContainsKey(key))
+            {
+                return methods[key];
+            }
+            throw new ArgumentException(key + " not initiallized");
+        }
+
+
     }
     public partial class Line
     {
@@ -729,6 +765,14 @@ namespace DATA_CONVERTER
     public class Method
     { 
         // ading in a true methods to the language
-
+        public String[] code;
+        public Type ty;
+        public Dictionary<string,Object> args;
+        public Method(String[] co, Type t, Dictionary<string,Object> Parameters)
+        {
+            this.code = co;
+            this.ty = t;
+            this.args = Parameters;
+        }
     }
 }
