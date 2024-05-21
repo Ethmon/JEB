@@ -623,6 +623,10 @@ namespace DATA_CONVERTER
             {
                 setFile(key, (file)data);
             }
+            else if (data is Method)
+            {
+                setMethod(key, ((Method)data).get_code(), ((Method)data).get_type(), ((Method)data).get_args());
+            }
         }
 
 
