@@ -588,6 +588,42 @@ namespace DATA_CONVERTER
                 }
             }
         }
+        public void SuperSet(string key, Object data)
+        {
+            remove(key);
+            if (data is string)
+            {
+                setS(key, (string)data);
+            }
+            else if (data is double)
+            {
+                setD(key, (double)data);
+            }
+            else if (data is int)
+            {
+                setI(key, (int)data);
+            }
+            else if (data is Data)
+            {
+                setsheet(key, (Data)data);
+            }
+            else if (data is Dictionary<string, Object>)
+            {
+                setCustom(key, (Dictionary<string, Object>)data);
+            }
+            else if (data is Line)
+            {
+                setLine(key, (Line)data);
+            }
+            else if (data is Function)
+            {
+                setFunction(key, (Function)data);
+            }
+            else if (data is file)
+            {
+                setFile(key, (file)data);
+            }
+        }
 
 
 
@@ -762,7 +798,7 @@ namespace DATA_CONVERTER
         }
         partial void Execute();
     }
-    public class Method
+    public partial class Method
     { 
         // ading in a true methods to the language
         public String[] code;
@@ -774,5 +810,19 @@ namespace DATA_CONVERTER
             this.ty = t;
             this.args = Parameters;
         }
+        public string[] get_code()
+        {
+            return code;
+        }
+        public Type get_type()
+        {
+            return ty;
+        }
+        public Dictionary<string,Object> get_args()
+        {
+            return args;
+        }
+        
+        
     }
 }

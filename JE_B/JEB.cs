@@ -201,6 +201,7 @@ namespace jumpE_basic
     }
     public class base_runner
     {
+        public Object return_value = null;
         public List<string> code = new List<string>();
         public List<string> lines = new List<string>();
         public string taken_in_string;
@@ -2116,120 +2117,36 @@ namespace Imported_commands
                     {
                         try
                         {
-                            string equation = "";
+                            double j = doMath(code.Skip(2).ToArray(), D);
+                            
                             if (code[1] == "=")
                             {
-                                for (int i = 2; i < code.Count(); i++)
-                                {
-                                    double j;
-                                    if (Double.TryParse(code[i], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                    code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "%" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                                    {
-                                        equation += code[i] + " ";
-                                    }
-                                    else if (D.isnumvar(code[i]))
-                                    {
-                                        equation += D.referenceVar(code[i]) + " ";
-                                    }
-                                }
-                                CalculationEngine engine = new CalculationEngine();
-                                D.setD(code[0], (engine.Calculate(equation, drict)));
+
+                                D.setD(code[0], j);
 
                             }
                             else if (code[1] == "+=")
                             {
-                                for (int i = 2; i < code.Count(); i++)
-                                {
-                                    double j;
-                                    if (Double.TryParse(code[i], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                    code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "%" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                                    {
-                                        equation += code[i] + " ";
-                                    }
-                                    else if (D.isnumvar(code[i]))
-                                    {
-                                        equation += D.referenceVar(code[i]) + " ";
-                                    }
-                                }
-                                CalculationEngine engine = new CalculationEngine();
-                                D.setD(code[0], D.referenceD(code[0]) + (engine.Calculate(equation, drict)));
+
+                                D.setD(code[0], D.referenceD(code[0]) + j);
 
                             }
                             else if (code[1] == "-=")
                             {
-                                for (int i = 2; i < code.Count(); i++)
-                                {
-                                    double j;
-                                    if (Double.TryParse(code[i], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                    code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "%" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                                    {
-                                        equation += code[i] + " ";
-                                    }
-                                    else if (D.isnumvar(code[i]))
-                                    {
-                                        equation += D.referenceVar(code[i]) + " ";
-                                    }
-                                }
-                                CalculationEngine engine = new CalculationEngine();
-                                D.setD(code[0], D.referenceD(code[0]) - (engine.Calculate(equation, drict)));
+
+                                D.setD(code[0], D.referenceD(code[0]) - j);
 
                             }
                             else if (code[1] == "*=")
                             {
-                                for (int i = 2; i < code.Count(); i++)
-                                {
-                                    double j;
-                                    if (Double.TryParse(code[i], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                    code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "%" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                                    {
-                                        equation += code[i] + " ";
-                                    }
-                                    else if (D.isnumvar(code[i]))
-                                    {
-                                        equation += D.referenceVar(code[i]) + " ";
-                                    }
-                                }
-                                CalculationEngine engine = new CalculationEngine();
-                                D.setD(code[0], D.referenceD(code[0]) * (engine.Calculate(equation, drict)));
+
+                                D.setD(code[0], D.referenceD(code[0]) * j);
 
                             }
                             else if (code[1] == "/=")
                             {
-                                for (int i = 2; i < code.Count(); i++)
-                                {
-                                    double j;
-                                    if (Double.TryParse(code[i], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                    code[i] == "csc" || code[i] == "sec" || code[i] == "cot" || code[i] == "%" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                                    {
-                                        equation += code[i] + " ";
-                                    }
-                                    else if (D.isnumvar(code[i]))
-                                    {
-                                        equation += D.referenceVar(code[i]) + " ";
-                                    }
-                                }
-                                CalculationEngine engine = new CalculationEngine();
-                                D.setD(code[0], D.referenceD(code[0]) / (engine.Calculate(equation, drict)));
+
+                                D.setD(code[0], D.referenceD(code[0]) / j);
 
                             }
                             else if (code[1] == "++")
@@ -2507,7 +2424,7 @@ namespace Imported_commands
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
-                                string equation = "";
+                                List<string> codes = new List<string>();
                                 for (int ll = i; ll < code.Count; ll++)
                                 {
                                     if (code[ll] == "#" && code[ll + 1] == "#M")
@@ -2515,23 +2432,9 @@ namespace Imported_commands
                                         i = ll + 1;
                                         break;
                                     }
-                                    double j;
-                                    if (Double.TryParse(code[ll], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
-                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
-                                    {
-                                        equation += code[ll] + " ";
-                                    }
-                                    else if (D.isnumvar(code[ll]))
-                                    {
-                                        equation += D.referenceVar(code[ll]) + " ";
-                                    }
+                                    codes.Add(code[ll]);
                                 }
-                                CalculationEngine engine = new CalculationEngine();
-                                mesage += engine.Calculate(equation);
+                                mesage += doMath(codes.ToArray(),D);
                             }
                             else
                             {
@@ -2576,25 +2479,9 @@ namespace Imported_commands
                     }
                     else if (code[2] == "=")
                     {
-                        for (int i = 3; i < code.Count(); i++)
-                        {
-                            double j;
-                            if (Double.TryParse(code[i], out j))
-                            {
-                                equation += j + " ";
-                            }
-                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                            code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                            {
-                                equation += code[i] + " ";
-                            }
-                            else if (D.isnumvar(code[i]))
-                            {
-                                equation += D.referenceVar(code[i]) + " ";
-                            }
-                        }
-                        CalculationEngine engine = new CalculationEngine();
-                        D.setD(code[1], (engine.Calculate(equation, drict)));
+                        String[] c = code.Skip(3).ToArray();
+                        
+                        D.setD(code[1], doMath(c, D));
                         /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
                         {
                             Base.commandRegistry.add_command(code[1], this.Math_equation);
@@ -2792,6 +2679,61 @@ namespace Imported_commands
                 default:
                     return typeof(void);
             }
+        }
+        public static double doMath(string[] equation, Data D)
+        {
+            IDictionary<string, double> drict = new Dictionary<string, double>();
+            string equationa = "";
+            for (int i = 0; i < equation.Length; i++)
+            {
+                if (equation[i] == "+" || equation[i] == "-" || equation[i] == "/" || equation[i] == "*" || equation[i] == "sin" || equation[i] == "cos" || equation[i] == "tan" ||
+                                       equation[i] == "csc" || equation[i] == "sec" || equation[i] == "%" || equation[i] == "cot" || equation[i] == "root" || equation[i] == ")" || equation[i] == "(" || equation[i] == " ")
+                {
+                    equationa += equation[i] + " ";
+                }
+                else if (D.isnumvar(equation[i].ToString()))
+                {
+                    equationa += D.referenceVar(equation[i].ToString()) + " ";
+                }
+                if (equation[i] == "!F!")
+                {
+                    object[] args = new object[D.referenceMethod(equation[i + 1]).get_args().Count()];
+                    for(int j = i+2; j < D.referenceMethod(equation[i+1]).get_args().Count() + i + 2; j++)
+                    {
+                        args[j - i - 2] = D.referenceVar(equation[j]);
+                    }
+                    i = i + D.referenceMethod(equation[i + 1]).get_args().Count() + 1;
+                    if (doMethod(D.referenceMethod(equation[i + 1]), args, D) == null)
+                    {
+                        continue;
+                    }
+                    equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D);
+                }
+                
+            }
+            CalculationEngine engine = new CalculationEngine();
+            return engine.Calculate(equationa, drict);
+        }
+
+        public static Object doMethod(Method m, object[] args, Data D)
+        {
+            string full = "";
+            foreach(string it in m.get_code())
+            {
+                full += it + "\n";
+            }
+            full += "end";
+            Data DD = D.Copy();
+            int i = 0;
+            foreach(string key in m.get_args().Keys)
+            {
+                DD.SuperSet(key, args[i]);
+                i ++;
+            }
+            
+            base_runner Base = new base_runner(full,DD);
+            return Base.return_value;
+
         }
     }
 
