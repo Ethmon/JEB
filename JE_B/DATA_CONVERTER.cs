@@ -628,6 +628,10 @@ namespace DATA_CONVERTER
                 setMethod(key, ((Method)data).get_code(), ((Method)data).get_type(), ((Method)data).get_args());
             }
         }
+        public Type getType(string key)
+        {
+            return referenceVar(key).GetType();
+        }
 
 
 
