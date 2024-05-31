@@ -2024,7 +2024,7 @@ namespace Imported_commands
                     }
                     catch
                     {
-                        throw new Exception("Initialization error");
+                        throw new Exception("Initialization error " + Base.position);
                     }
                 }
                 if (D.indouble(code[0]))
@@ -2576,7 +2576,7 @@ namespace Imported_commands
                 }   
 
                 D.setMethod(code[1], args.ToArray(), t, list);
-
+                
             }
         }
         
@@ -2624,6 +2624,10 @@ namespace Imported_commands
                         continue;
                     }
                     equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D);
+                }
+                else if (double.TryParse(equation[i],out double k))
+                {
+                    equationa += k + " ";
                 }
                 
             }
