@@ -672,18 +672,21 @@ namespace DATA_CONVERTER
     {
         private int line_number;
         private string line_string;
+        public string file_path;
         private Data acsesed_data;
         public Line()
         {
             acsesed_data = new Data();
             line_number = 0;
+            file_path = "";
         }
-        public Line(int line_num)
+        public Line(int line_num, string filepath)
         {
             acsesed_data = new Data();
             line_number = line_num;
+            file_path = filepath;
         }
-        public Line(int line_number, Data acsesed_data) : this(line_number)
+        public Line(int line_number,string filepath, Data acsesed_data) : this(line_number,filepath)
         {
             this.acsesed_data = acsesed_data;
         }
@@ -718,20 +721,23 @@ namespace DATA_CONVERTER
         private int start_int;
         private int end_int;
         private string function_string;
+        public string file_path;
         private Data acsesed_data;
         public Function()
         {
-               acsesed_data = new Data();
+            acsesed_data = new Data();
             start_int = 0;
             end_int = 1;
+            file_path = "";
         }
-        public Function(int start_int, int end_int)
+        public Function(int start_int, int end_int, string path)
         {
             acsesed_data = new Data();
             this.start_int = start_int;
             this.end_int = end_int;
+            file_path = path;
         }
-        public Function(int start_int, int end_int, Data acsesed_data) : this(start_int, end_int)
+        public Function(int start_int, int end_int,string path, Data acsesed_data) : this(start_int, end_int, path)
         {
             this.acsesed_data = acsesed_data;
         }
@@ -771,7 +777,7 @@ namespace DATA_CONVERTER
     }
     public partial class file
     {
-        private string file_path;
+        public string file_path;
         private string file_context;
         private Data acsesed_data;
         public file()

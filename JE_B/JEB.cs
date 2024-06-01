@@ -87,7 +87,7 @@ namespace jumpE_basic
                         using (StreamReader streamReader = File.OpenText(fileName))
                         {
                             string text = streamReader.ReadToEnd();
-                            base_runner bases = new base_runner(text, data);
+                            base_runner bases = new base_runner(text, data, Path.GetDirectoryName(hells));
                         }
                     }
                     catch (Exception e)
@@ -217,11 +217,13 @@ namespace jumpE_basic
         public static bool hard_stop = false;
         //public string data_storage = "@";
         private new pre_defined_variable f = new pre_defined_variable();
+        public string localPath = "";
 
-        public base_runner(string taken, DATA_CONVERTER.Data data)
+        public base_runner(string taken, DATA_CONVERTER.Data data, string localPath)
         {
             this.taken_in_string = taken;
             this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
+            this.localPath = localPath;
             this.position = 0;
             this.run = true;
             datas.Add(data);
@@ -290,6 +292,8 @@ namespace jumpE_basic
 
 
             }
+
+            this.localPath = localPath;
         }
 
         public void changePosition(int a)
@@ -1428,7 +1432,7 @@ namespace jumpE_basic
             {
                 if (code.Count >= 3)
                 {
-                    string filePath = code[1];
+                    string filePath = Base.localPath + code[1];
 
                     // Read the contents of the .cs file
                     string fileContent = File.ReadAllText(filePath);
@@ -1513,7 +1517,7 @@ namespace Imported_commands
             {
                 if (code.Count >= 3)
                 {
-                    string filePath = code[1];
+                    string filePath = Base.localPath + code[1];
                     string className = code[2];
 
                     // Read the contents of the .cs file
@@ -1844,7 +1848,7 @@ namespace Imported_commands
                             }
                         }
                         CalculationEngine engine = new CalculationEngine();
-                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)), D);
+                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)), Base.localPath, D);
                         D.setLine(code[1], u);
                     }
 
@@ -1924,7 +1928,7 @@ namespace Imported_commands
                         }
 
                         CalculationEngine engine = new CalculationEngine();
-                        DATA_CONVERTER.Function u = new Function((int)(engine.Calculate(equationa, drict)), (int)(engine.Calculate(equationb, drict)), D);
+                        DATA_CONVERTER.Function u = new Function((int)(engine.Calculate(equationa, drict)), (int)(engine.Calculate(equationb, drict)), Base.localPath, D);
                         D.setFunction(code[1], u);
                     }
 
@@ -1978,7 +1982,7 @@ namespace Imported_commands
                 {
                     try
                     {
-                        double j = doMath(code.Skip(2).ToArray(), D);
+                        double j = doMath(code.Skip(2).ToArray(), D,Base);
                         if (code[1] == "=")
                         {
                             
@@ -2033,7 +2037,7 @@ namespace Imported_commands
                     {
                         try
                         {
-                            double j = doMath(code.Skip(2).ToArray(), D);
+                            double j = doMath(code.Skip(2).ToArray(), D,Base);
                             
                             if (code[1] == "=")
                             {
@@ -2308,7 +2312,7 @@ namespace Imported_commands
                     {
                         args[j] = D.referenceVar(code[j]);
                     }
-                    doMethod(D.referenceMethod(code[0]), args, D);
+                    doMethod(D.referenceMethod(code[0]), args, D, Base);
                 }
 
             }
@@ -2359,7 +2363,7 @@ namespace Imported_commands
                                     }
                                     codes.Add(code[ll]);
                                 }
-                                mesage += doMath(codes.ToArray(),D);
+                                mesage += doMath(codes.ToArray(),D, Base);
                             }
                             else
                             {
@@ -2406,7 +2410,7 @@ namespace Imported_commands
                     {
                         String[] c = code.Skip(3).ToArray();
                         
-                        D.setD(code[1], doMath(c, D));
+                        D.setD(code[1], doMath(c, D, Base));
                         /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
                         {
                             Base.commandRegistry.add_command(code[1], this.Math_equation);
@@ -2607,7 +2611,7 @@ namespace Imported_commands
                     return typeof(void);
             }
         }
-        public static double doMath(string[] equation, Data D)
+        public static double doMath(string[] equation, Data D, base_runner Base)
         {
             IDictionary<string, double> drict = new Dictionary<string, double>();
             string equationa = "";
@@ -2630,11 +2634,11 @@ namespace Imported_commands
                         args[j - i - 2] = D.referenceVar(equation[j]);
                     }
                     i = i + D.referenceMethod(equation[i + 1]).get_args().Count() + 1;
-                    if (doMethod(D.referenceMethod(equation[i + 1]), args, D) == null)
+                    if (doMethod(D.referenceMethod(equation[i + 1]), args, D,Base) == null)
                     {
                         continue;
                     }
-                    equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D);
+                    equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D, Base);
                 }
                 else if (double.TryParse(equation[i],out double k))
                 {
@@ -2646,7 +2650,7 @@ namespace Imported_commands
             return engine.Calculate(equationa, drict);
         }
 
-        public static Object doMethod(Method m, object[] args, Data D)
+        public static Object doMethod(Method m, object[] args, Data D, base_runner Base)
         {
             string full = "";
             foreach(string it in m.get_code())
@@ -2662,8 +2666,8 @@ namespace Imported_commands
                 i ++;
             }
             
-            base_runner Base = new base_runner(full,DD);
-            return Base.return_value;
+            base_runner Baase = new base_runner(full,DD,Base.localPath);
+            return Baase.return_value;
 
         }
     }
@@ -2677,7 +2681,7 @@ namespace DATA_CONVERTER
     {
         partial void Execute()
         {
-            base_runner bases = new base_runner(this.line_string,this.acsesed_data);
+            base_runner bases = new base_runner(this.line_string,this.acsesed_data,this.file_path);
         }
 
     }
@@ -2685,14 +2689,14 @@ namespace DATA_CONVERTER
     {
         partial void Execute()
         {
-            base_runner bases = new base_runner(this.function_string,this.acsesed_data);
+            base_runner bases = new base_runner(this.function_string,this.acsesed_data,this.file_path);
         }
     }
     public partial class file
     {
         partial void Execute()
         {
-            base_runner bases = new base_runner(this.file_context,this.acsesed_data);
+            base_runner bases = new base_runner(this.file_context,this.acsesed_data,this.file_path);
         }
     }
 }
