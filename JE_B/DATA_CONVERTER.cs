@@ -296,7 +296,7 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key))
             {
                 return true;
             }
@@ -321,6 +321,14 @@ namespace DATA_CONVERTER
         public bool indouble(string key)
         {
             if (doubles.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool isMethod(string key)
+        {
+            if (methods.ContainsKey(key))
             {
                 return true;
             }

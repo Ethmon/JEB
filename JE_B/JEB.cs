@@ -2301,6 +2301,15 @@ namespace Imported_commands
                         }
                     }
                 }
+                if (D.isMethod(code[0]))
+                {
+                    object[] args = new object[D.referenceMethod(code[0]).get_args().Count()];
+                    for (int j = 1; j < D.referenceMethod(code[0]).get_args().Count()+1; j++)
+                    {
+                        args[j] = D.referenceVar(code[j]);
+                    }
+                    doMethod(D.referenceMethod(code[0]), args, D);
+                }
 
             }
         }
@@ -2592,6 +2601,8 @@ namespace Imported_commands
                     return typeof(string);
                 case ("sheet"):
                     return typeof(Data);
+                case ("void"):
+                    return typeof(void);
                 default:
                     return typeof(void);
             }
@@ -2611,7 +2622,7 @@ namespace Imported_commands
                 {
                     equationa += D.referenceVar(equation[i].ToString()) + " ";
                 }
-                if (equation[i] == "!F!")
+                else if (equation[i] == "!F!")
                 {
                     object[] args = new object[D.referenceMethod(equation[i + 1]).get_args().Count()];
                     for(int j = i+2; j < D.referenceMethod(equation[i+1]).get_args().Count() + i + 2; j++)
