@@ -28,7 +28,7 @@ namespace DATA_CONVERTER
 
         }
     }
-    public class Data
+    public partial class Data
     {
         Dictionary<string, string> strings = new Dictionary<string, string>();
         Dictionary<string, double> doubles = new Dictionary<string, double>();
@@ -846,5 +846,104 @@ namespace DATA_CONVERTER
         }
         
         
+    }
+    public partial class UNIQ
+    {
+        string code;
+        Dictionary<string, Method> methods = new Dictionary<string, Method>();
+        Data data = new Data();
+        public UNIQ(string code)
+        {
+            this.code = code;
+        }
+        public void addMethod(string key, Method method)
+        {
+            methods.Add(key, method);
+        }
+        public Method getMethod(string key)
+        {
+            return methods[key];
+        }
+        
+
+    }
+    public partial class list : JEnumeral
+    { 
+        Type t;
+        List<object> stuff;
+        public list(Type t)
+        {
+            this.t = t;
+            stuff = new List<object>();
+        }
+        public void add(object obj)
+        {
+            if(obj.GetType() == t)
+            {
+                stuff.Add(obj);
+            }
+            else
+            {
+                throw new ArgumentException("object is not of type " + t.ToString());
+            }
+        }
+        public void remove(object obj)
+        {
+            if(obj.GetType() == t)
+            {
+                stuff.Remove(obj);
+            }
+            else
+            {
+                throw new ArgumentException("object is not of type " + t.ToString());
+            }
+        }
+        public void remove(int index)
+        {
+            stuff.RemoveAt(index);
+        }
+        public object get(int index)
+        {
+            return stuff[index];
+        }
+        public void set(int index, object obj)
+        {
+            if(obj.GetType() != t)
+            {
+                throw new ArgumentException("object is not of type " + t.ToString());
+            }
+            stuff[index] = obj;
+        }
+        public int size()
+        {
+            return stuff.Count; 
+        }
+        public void sort()
+        {
+            stuff.Sort();
+        }
+        public int find(object obj)
+        {
+            if(obj.GetType() != t)
+            {
+                throw new ArgumentException("object is not of type " + t.ToString());
+            }
+            return stuff.IndexOf(obj);
+        }
+        public void clear()
+        {
+            stuff.Clear();
+        }
+
+    }
+
+    public interface JEnumeral
+    {
+         void add(object obj);
+         void remove(object obj);
+         void remove(int index);
+         object get(int index);
+         void set(int index, Object obj);
+         int size();
     }
 }

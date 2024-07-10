@@ -2111,7 +2111,8 @@ namespace Imported_commands
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
-                                string equation = "";
+
+                                List<string> codes = new List<string>();
                                 for (int ll = i; ll < code.Count; ll++)
                                 {
                                     if (code[ll] == "#" && code[ll + 1] == "#M")
@@ -2119,23 +2120,9 @@ namespace Imported_commands
                                         i = ll + 1;
                                         break;
                                     }
-                                    double j;
-                                    if (Double.TryParse(code[ll], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
-                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
-                                    {
-                                        equation += code[ll] + " ";
-                                    }
-                                    else if (D.isnumvar(code[ll]))
-                                    {
-                                        equation += D.referenceVar(code[ll]) + " ";
-                                    }
+                                    codes.Add(code[ll]);
                                 }
-                                CalculationEngine engine = new CalculationEngine();
-                                mesage += engine.Calculate(equation);
+                                mesage += doMath(codes.ToArray(), D, Base);
                             }
                             else
                             {
@@ -2159,7 +2146,7 @@ namespace Imported_commands
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
-                                string equation = "";
+                                List<string> codes = new List<string>();
                                 for (int ll = i; ll < code.Count; ll++)
                                 {
                                     if (code[ll] == "#" && code[ll + 1] == "#M")
@@ -2167,27 +2154,13 @@ namespace Imported_commands
                                         i = ll + 1;
                                         break;
                                     }
-                                    double j;
-                                    if (Double.TryParse(code[ll], out j))
-                                    {
-                                        equation += j + " ";
-                                    }
-                                    else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
-                                    code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
-                                    {
-                                        equation += code[ll] + " ";
-                                    }
-                                    else if (D.isnumvar(code[ll]))
-                                    {
-                                        equation += D.referenceVar(code[ll]) + " ";
-                                    }
+                                    codes.Add(code[ll]);
                                 }
-                                CalculationEngine engine = new CalculationEngine();
-                                mesage += engine.Calculate(equation);
+                                mesage += doMath(codes.ToArray(), D, Base);
                             }
                             else
                             {
-                                mesage += code[i] + " ";
+                                mesage += code[i];
                                 i++;
                             }
                         }
