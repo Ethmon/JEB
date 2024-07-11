@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Resources;
@@ -38,6 +39,9 @@ namespace DATA_CONVERTER
         Dictionary<string, Function> functions = new Dictionary<string, Function>();
         Dictionary<string, file> files = new Dictionary<string, file>();
         Dictionary<string, Method> methods = new Dictionary<string, Method>();
+        Dictionary<string, UNIQ> UNIQs = new Dictionary<string, UNIQ>();
+        Dictionary<string, list> lists = new Dictionary<string, list>();
+
         
         Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
         public int identifier = 0;
@@ -52,14 +56,6 @@ namespace DATA_CONVERTER
             {
                 throw new ArgumentException(key + " not initiallized");
             }
-        }
-        public bool CheckifNotInitiallized(string key)
-        {
-            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key) || methods.ContainsKey(key))
-            {
-                return false;
-            }
-            return true;
         }
         public void remove(string key)
         {
@@ -95,6 +91,14 @@ namespace DATA_CONVERTER
             else if (files.ContainsKey(key))
             {
                 files.Remove(key);
+            }
+            else if (methods.ContainsKey(key))
+            {
+                methods.Remove(key);
+            }
+            else if (UNIQs.ContainsKey(key))
+            {
+                UNIQs.Remove(key);
             }
             
 
@@ -296,7 +300,7 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key)||UNIQs.ContainsKey(key))
             {
                 return true;
             }
@@ -440,6 +444,58 @@ namespace DATA_CONVERTER
                 }
             }
         }
+        public void setMethod(string key, string[] code, Type t, Dictionary<string, Object> args)
+        {
+            if ((isMethod(key) && isvar(key)) || !isvar(key))
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (methods.ContainsKey(key))
+                    {
+                        methods.Remove(key);
+                    }
+                    methods.Add(key, new Method(code, t, args));
+                }
+            }
+            else
+            {
+                Console.WriteLine("variable set to other type");
+            }
+        }
+        public bool islist(string key)
+        {
+            if (lists.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
+        }
+        public void setlist(string key, list data)
+        {
+            if ((isvar(key) && islist(key)) || !isvar(key))
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (lists.ContainsKey(key))
+                    {
+                        lists.Remove(key);
+                    }
+                    lists.Add(key, data);
+                }
+            }
+            else
+            {
+                Console.WriteLine("variable set to other type");
+            }
+        }
         public void setLine(string key, Line data)
         {
             if (doubles.ContainsKey(key) || strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || files.ContainsKey(key) || functions.ContainsKey(key))
@@ -464,11 +520,7 @@ namespace DATA_CONVERTER
         }
         public void setFunction(string key, Function data)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || files.ContainsKey(key)||strings.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            if ((isFunction(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -483,14 +535,15 @@ namespace DATA_CONVERTER
                     functions.Add(key, data);
                 }
             }
+            else
+            {
+                
+                Console.WriteLine("variable set to other type");
+            }
         }
         public void setFile(string key, file data)
         {
-            if (doubles.ContainsKey(key) ||strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key)||functions.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            if((isFile(key)&&isvar(key))||!isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -505,15 +558,16 @@ namespace DATA_CONVERTER
                     files.Add(key, data);
                 }
             }
+            else
+            {
+                
+                Console.WriteLine("variable set to other type");
+            }
         }
 
         public void setD(string key, double data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            if ((indouble(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -527,11 +581,47 @@ namespace DATA_CONVERTER
                     }
                     doubles.Add(key, data);
                 }
+                
             }
+            else
+            {
+                Console.WriteLine("variable set to other type");
+            }
+        }
+        public void setUNIQ(string key,UNIQ data)
+        {
+            if ((isUNIQ(key) && isvar(key)) || !isvar(key))
+            {
+                if (Double.TryParse(key, out _))
+                {
+                    Console.WriteLine("variable name contains only numbers");
+                }
+                else
+                {
+                    if (UNIQs.ContainsKey(key))
+                    {
+                        UNIQs.Remove(key);
+                    }
+                    UNIQs.Add(key, data);
+                }
+                
+            }
+            else
+            {
+                Console.WriteLine("variable set to other type");
+            }
+        }
+        public bool isUNIQ(string key)
+        {
+            if(UNIQs.ContainsKey(key))
+            {
+                return true;
+            }
+            return false;
         }
         public void setCustom(string key, Dictionary<string, Object> data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || doubles.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
+            if (isvar(key))
             {
                 Console.WriteLine("variable set to other type");
             }
@@ -554,11 +644,7 @@ namespace DATA_CONVERTER
 
         public void setsheet(string key, Data data)
         {
-            if (strings.ContainsKey(key) || integers.ContainsKey(key) || doubles.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            if ((issheet(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -573,14 +659,15 @@ namespace DATA_CONVERTER
                     sheets.Add(key, data);
                 }
             }
+            else
+            {
+                
+                Console.WriteLine("variable set to other type");
+            }
         }
         public void setI(string key, int data)
         {
-            if (strings.ContainsKey(key) || doubles.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            if ((inint(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -594,6 +681,10 @@ namespace DATA_CONVERTER
                     }
                     integers.Add(key, data);
                 }
+            }
+            else
+            {
+                Console.WriteLine("variable set to other type");
             }
         }
         public void SuperSet(string key, Object data)
@@ -635,6 +726,10 @@ namespace DATA_CONVERTER
             {
                 setMethod(key, ((Method)data).get_code(), ((Method)data).get_type(), ((Method)data).get_args());
             }
+            else if(data is UNIQ)
+            {
+                setUNIQ(key, ((UNIQ)data));
+            }
         }
         public Type getType(string key)
         {
@@ -650,13 +745,7 @@ namespace DATA_CONVERTER
 
 
 
-        public void setMethod(string key, String[] lines, Type Ty, Dictionary<string,Object> para)
-        {
-            if(CheckifNotInitiallized(key))
-            {
-                methods.Add(key, new Method(lines, Ty, para));
-            }
-        }
+        
         public Method referenceMethod(string key)
         {
             if(methods.ContainsKey(key))
@@ -819,6 +908,62 @@ namespace DATA_CONVERTER
             Execute();
         }
         partial void Execute();
+        public static bool operator ==(file f1, file f2)
+        {
+            if(f1.file_path == f2.file_path)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator !=(file f1, file f2)
+        {
+            if (f1.file_path != f2.file_path)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator >(file f1, file f2)
+        {
+            if (f1.file_path.Length > f2.file_path.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator <(file f1, file f2)
+        {
+            if (f1.file_path.Length < f2.file_path.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator >=(file f1, file f2)
+        {
+            if (f1.file_path.Length >= f2.file_path.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator <=(file f1, file f2)
+        {
+            if (f1.file_path.Length <= f2.file_path.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool Equals(file f)
+        {
+            if(this.file_path == f.file_path)
+            {
+                return true;
+            }
+            return false;
+        }
     }
     public partial class Method
     { 
@@ -844,7 +989,54 @@ namespace DATA_CONVERTER
         {
             return args;
         }
-        
+        public static bool operator ==(Method m1, Method m2)
+        {
+            if(m1.code == m2.code && m1.ty == m2.ty && m1.args == m2.args)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator !=(Method m1, Method m2)
+        {
+            if (m1.code != m2.code || m1.ty != m2.ty || m1.args != m2.args)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator >(Method m1, Method m2)
+        {
+            if (m1.code.Length > m2.code.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator <(Method m1, Method m2)
+        {
+            if (m1.code.Length < m2.code.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator >=(Method m1, Method m2)
+        {
+            if (m1.code.Length >= m2.code.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator <=(Method m1, Method m2)
+        {
+            if (m1.code.Length <= m2.code.Length)
+            {
+                return true;
+            }
+            return false;
+        }
         
     }
     public partial class UNIQ
@@ -935,6 +1127,147 @@ namespace DATA_CONVERTER
             stuff.Clear();
         }
 
+        
+        public static bool operator ==(list l1, list l2)
+        {
+            if(l1.size() != l2.size())
+            {
+                return false;
+            }
+            for(int i = 0; i < l1.size(); i++)
+            {
+                if(l1.get(i) != l2.get(i))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        public static bool operator !=(list l1, list l2)
+        {
+            if (l1.size() != l2.size())
+            {
+                return true;
+            }
+            for (int i = 0; i < l1.size(); i++)
+            {
+                if (l1.get(i) != l2.get(i))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public static bool operator >(list l1, list l2)
+        {
+            if(l1.t!=l2.t)
+            {
+                throw new ArgumentException("lists are not of the same type");
+            }
+            switch(l1.t.ToString())
+            {
+                case ("System.Int32"):
+                    if (l1.size() == l2.size())
+                    {
+                        for (int i = 0; i < l1.size(); i++)
+                        {
+                            if ((int)l1.get(i) < (int)l2.get(i))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    if (l1.size() > l2.size())
+                    {
+                        return true;
+                    }
+                    break;
+                case ("System.Double"):
+                    if (l1.size() == l2.size())
+                    {
+                        for (int i = 0; i < l1.size(); i++)
+                        {
+                            if ((double)l1.get(i) < (double)l2.get(i))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    if (l1.size() > l2.size())
+                    {
+                        return true;
+                    }
+                    break;
+                case ("System.String"):
+                    if (l1.size() == l2.size())
+                    {
+                        for (int i = 0; i < l1.size(); i++)
+                        {
+                            if (String.Compare((string)l1.get(i), (string)l2.get(i)) < 0)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    if (l1.size() > l2.size())
+                    {
+                        return true;
+                    }
+                    break;
+                case ("DATA_CONVERTER.list"):
+                    if (l1.size() == l2.size())
+                    {
+                        for (int i = 0; i < l1.size(); i++)
+                        {
+                            if ((list)l1.get(i) < (list)l2.get(i))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    if (l1.size() > l2.size())
+                    {
+                        return true;
+                    }
+                    break;
+
+
+            }
+            
+            return false;
+        }
+        public static bool operator <(list l1, list l2)
+        {
+            if (l1.size() < l2.size())
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator >=(list l1, list l2)
+        {
+            if (l1.size() >= l2.size())
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool operator <=(list l1, list l2)
+        {
+            if (l1.size() <= l2.size())
+            {
+                return true;
+            }
+            return false;
+        }
+        public bool Equals(list l)
+        {
+            if(this == l)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 
     public interface JEnumeral

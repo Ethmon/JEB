@@ -346,6 +346,18 @@ namespace jumpE_basic
 
                 return words;
             }
+            public static List<string> comaizer(string input)
+            {
+                List<string> words = new List<string>();
+                string[] tokens = input.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string line in tokens)
+                {
+                    words.Add(line);
+                }
+
+                return words;
+            }
             // just removes all '\t' and ' ' from the string
             public static string no_tab_spaces(string input)
             {
@@ -398,7 +410,7 @@ namespace jumpE_basic
                 pop pop = new pop();
                 callLayer callLy = new callLayer();
                 jump jump = new jump();//jumps to a line number or calls a function use "JP >> {function name}" to call a function
-                inputD inputD = new inputD();//takes a double input and stores it in a variable, variable must allready be initalized
+                inputD inputD = new inputD();//takes a double input and stores it in a variable, variable must allready be initalized 
                 comment comment = new comment();// used to comment out lines of code, can be used with // or #
                 inputS inputS = new inputS();//takes a string input and stores it in a variable, variable must allready be initalized
                 inputI inputI = new inputI();//takes a int input and stores it in a variable, variable must allready be initalized
@@ -717,7 +729,7 @@ namespace jumpE_basic
                         }
                         else if (code[i] == "M#" && code[i + 1] == "#")
                         {
-                            string equation = "";
+                            List<string> codes = new List<string>();
                             for (int ll = i; ll < code.Count; ll++)
                             {
                                 if (code[ll] == "#" && code[ll + 1] == "#M")
@@ -725,23 +737,9 @@ namespace jumpE_basic
                                     i = ll + 1;
                                     break;
                                 }
-                                double j;
-                                if (Double.TryParse(code[ll], out j))
-                                {
-                                    equation += j + " ";
-                                }
-                                else if (code[ll] == "+" || code[ll] == "-" || code[ll] == "/" || code[ll] == "*" || code[ll] == "sin" || code[ll] == "cos" || code[ll] == "%" || code[ll] == "tan" ||
-                                code[ll] == "csc" || code[ll] == "sec" || code[ll] == "cot" || code[ll] == "root" || code[ll] == ")" || code[ll] == "(" || code[ll] == " ")
-                                {
-                                    equation += code[ll] + " ";
-                                }
-                                else if (D.isnumvar(code[ll]))
-                                {
-                                    equation += D.referenceVar(code[ll]) + " ";
-                                }
+                                codes.Add(code[ll]);
                             }
-                            CalculationEngine engine = new CalculationEngine();
-                            Message += engine.Calculate(equation);
+                            Message += doMath(codes.ToArray(), D, Base);
                         }
                         else
                         {
@@ -1615,7 +1613,78 @@ namespace Imported_commands
 
             }
         }
+        public class listFunc : command_centrall
+        {
+            private CommandRegistry commandRegistry;
 
+
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                try
+                {
+                    if (code.Count() == 3)
+                    {
+                        D.setlist(code[1], new list(getType(code[2])));
+                        //this.commands.add_command(code[1], this.Math_equation);
+                    }
+                    else if (code[4] == "=")
+                    {
+                        list l = new list(getType(code[3]));
+                        //split is between commas
+                        List<List<string>> strings = new List<List<string>>();
+                        List<string> codes = new List<string>();
+                        for(int i = 5; i < code.Count(); i++)
+                        {
+                            if (code[i] == ",")
+                            {
+                                strings.Add(codes);
+                                codes = new List<string>();
+                            }
+                            else
+                            {
+                                codes.Add(code[i]);
+                            }
+                        }
+                        if (code[3] == "int" || code[3] == "double")
+                        {
+                            for (int i = 0; i < strings.Count(); i++)
+                            {
+                                l.add(doMath(strings[i].ToArray(), D, Base));
+                            }
+                        }
+                        if (code[3]=="string")
+                        {
+                            for(int i = 0;i<strings.Count();i++)
+                            {
+                                
+                                l.add(strings[i].ToString());
+                            }
+                        }
+                        if (code[3]=="sheet")
+                        {
+                            for(int i = 0;i<strings.Count();i++)
+                            {
+                                l.add(D.referenceSheet(strings[i].ToString()));
+                            }
+                        }
+
+
+
+                        D.setlist(code[1],l);
+                        /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
+                        {
+                            Base.commandRegistry.add_command(code[1], this.Math_equation);
+                        }*/
+
+                    }
+
+                }
+                catch
+                {
+                    Console.WriteLine("Initialization error");
+                }
+            }
+        }
         public class inputD : command_centrall
         {
             public override void Execute(List<string> code, DATA_CONVERTER.Data D, base_runner Base)
@@ -1716,29 +1785,43 @@ namespace Imported_commands
             {
                 try
                 {
-                    string Message = "";
 
-                    for (int i = 1; i < code.Count; i++)
+                    if (code[2] == "=")
                     {
-                        if (code[i] == "ReFs")
+                        string mesage = "";
+                        for (int i = 3; i < code.Count(); i++)
                         {
-                            string Messagee = D.referenceS(code[i + 1]);
-                            Message += Messagee + " ";
-                            i += 1;
-                        }
-                        else if (code[i] == "ReFd")
-                        {
-                            double Messagee = D.referenceD(code[i + 1]);
-                            Message += Messagee + " ";
-                            i += 1;
-                        }
-                        else
-                        {
-                            Message += code[i] + " ";
-                        }
+                            if (code[i] == "\"" && code[i + 2] == "\"")
+                            {
+                                mesage += D.referenceVar(code[i + 1]);
+                                i += 2;
+                            }
+                            else if (code[i] == "!S!")
+                            {
+                                mesage += " ";
+                            }
+                            else if (code[i] == "M#" && code[i + 1] == "#")
+                            {
 
+                                List<string> codes = new List<string>();
+                                for (int ll = i; ll < code.Count; ll++)
+                                {
+                                    if (code[ll] == "#" && code[ll + 1] == "#M")
+                                    {
+                                        i = ll + 1;
+                                        break;
+                                    }
+                                    codes.Add(code[ll]);
+                                }
+                                mesage += doMath(codes.ToArray(), D, Base);
+                            }
+                            else
+                            {
+                                mesage += code[i];
+                                i++;
+                            }
+                        }
                     }
-                    D.setS(code[1], Message);
                 }
                 catch
                 {
@@ -1763,7 +1846,6 @@ namespace Imported_commands
 
                 try
                 {
-                    string equation = "";
                     if (code.Count() == 2)
                     {
                         D.setI(code[1], 0);
@@ -1772,29 +1854,8 @@ namespace Imported_commands
                     }
                     else if (code[2] == "=")
                     {
-                        for (int i = 3; i < code.Count(); i++)
-                        {
-                            double j;
-                            if (Double.TryParse(code[i], out j))
-                            {
-                                equation += j + " ";
-                            }
-                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                            code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                            {
-                                equation += code[i] + " ";
-                            }
-                            else if (D.isnumvar(code[i]))
-                            {
-                                equation += D.referenceVar(code[i]) + " ";
-                            }
-                        }
-                        CalculationEngine engine = new CalculationEngine();
-                        D.setI(code[1], (int)(engine.Calculate(equation, drict)));
-                        /*if (!(Base.commandRegistry.ContainsCommand(code[1])))
-                        {
-                            Base.commandRegistry.add_command(code[1], this.Math_equation);
-                        }*/
+                        String[] c = code.Skip(3).ToArray();
+                        D.setI(code[1], (int)doMath(c, D, Base));
 
                     }
 
@@ -1821,7 +1882,6 @@ namespace Imported_commands
 
                 try
                 {
-                    string equation = "";
                     if (code.Count() == 2)
                     {
                         D.setD(code[1], 0);
@@ -1830,25 +1890,8 @@ namespace Imported_commands
                     }
                     else if (code[2] == "=")
                     {
-                        for (int i = 3; i < code.Count(); i++)
-                        {
-                            double j;
-                            if (Double.TryParse(code[i], out j))
-                            {
-                                equation += j + " ";
-                            }
-                            else if (code[i] == "+" || code[i] == "-" || code[i] == "/" || code[i] == "*" || code[i] == "sin" || code[i] == "cos" || code[i] == "tan" ||
-                                                           code[i] == "csc" || code[i] == "sec" || code[i] == "%" || code[i] == "cot" || code[i] == "root" || code[i] == ")" || code[i] == "(" || code[i] == " ")
-                            {
-                                equation += code[i] + " ";
-                            }
-                            else if (D.isnumvar(code[i]))
-                            {
-                                equation += D.referenceVar(code[i]) + " ";
-                            }
-                        }
-                        CalculationEngine engine = new CalculationEngine();
-                        DATA_CONVERTER.Line u = new Line((int)(engine.Calculate(equation, drict)), Base.localPath, D);
+                        String[] c = code.Skip(3).ToArray();
+                        Line u = new Line((int)doMath(c, D, Base), Base.localPath, D);
                         D.setLine(code[1], u);
                     }
 
@@ -2359,6 +2402,7 @@ namespace Imported_commands
                 }
             }
         }
+
         public class double_func : command_centrall
         {
             //pre_defined_variable Math_equation;
@@ -2373,7 +2417,6 @@ namespace Imported_commands
             {
                 try
                 {
-                    string equation = "";
                     if (code.Count() == 2)
                     {
                         D.setD(code[1], 0);
