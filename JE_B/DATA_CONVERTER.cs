@@ -404,7 +404,7 @@ namespace DATA_CONVERTER
             {
                 return custom_types[key];
             }
-            else if(lines.ContainsKey(key))
+            else if (lines.ContainsKey(key))
             {
                 return lines[key];
             }
@@ -415,6 +415,14 @@ namespace DATA_CONVERTER
             else if (files.ContainsKey(key))
             {
                 return files[key];
+            }
+            else if (lists.ContainsKey(key))
+            {
+                return lists[key];
+            }
+            else if (UNIQs.ContainsKey(key))
+            {
+                return UNIQs[key];
             }
             else
             {
@@ -1059,18 +1067,40 @@ namespace DATA_CONVERTER
         
 
     }
+    public class GB
+    {
+        public static string GetType(object obj)
+        {
+            string type = "void";
+            if (obj.GetType() == typeof(int))
+                type = "int";
+            else if (obj.GetType() == typeof(double))
+                type = "double";
+            else if (obj.GetType() == typeof(string))
+                type = "string";
+            else if (obj.GetType() == typeof(list))
+                type = "list";
+            else if (obj.GetType() == typeof(UNIQ))
+                type = "UNIQ";
+            else if (obj.GetType() == typeof(Method))
+                type = "method";
+
+
+            return type;
+        }
+    }
     public partial class list : JEnumeral
     { 
-        Type t;
+        public string t;
         List<object> stuff;
-        public list(Type t)
+        public list(string t)
         {
             this.t = t;
             stuff = new List<object>();
         }
         public void add(object obj)
         {
-            if(obj.GetType() == t)
+            if(GB.GetType(obj) == t)
             {
                 stuff.Add(obj);
             }
@@ -1081,7 +1111,7 @@ namespace DATA_CONVERTER
         }
         public void remove(object obj)
         {
-            if(obj.GetType() == t)
+            if(GB.GetType(obj) == t)
             {
                 stuff.Remove(obj);
             }
@@ -1100,7 +1130,7 @@ namespace DATA_CONVERTER
         }
         public void set(int index, object obj)
         {
-            if(obj.GetType() != t)
+            if(GB.GetType(obj) != t)
             {
                 throw new ArgumentException("object is not of type " + t.ToString());
             }
@@ -1116,7 +1146,7 @@ namespace DATA_CONVERTER
         }
         public int find(object obj)
         {
-            if(obj.GetType() != t)
+            if(GB.GetType(obj) != t)
             {
                 throw new ArgumentException("object is not of type " + t.ToString());
             }
@@ -1125,6 +1155,15 @@ namespace DATA_CONVERTER
         public void clear()
         {
             stuff.Clear();
+        }
+        public override String ToString()
+        {
+            string returned = "";
+            foreach(object i in stuff)
+            {
+                returned += stuff.ToString() + " ";
+            }
+            return returned;
         }
 
         
@@ -1166,7 +1205,7 @@ namespace DATA_CONVERTER
             }
             switch(l1.t.ToString())
             {
-                case ("System.Int32"):
+                case ("int"):
                     if (l1.size() == l2.size())
                     {
                         for (int i = 0; i < l1.size(); i++)
@@ -1182,7 +1221,7 @@ namespace DATA_CONVERTER
                         return true;
                     }
                     break;
-                case ("System.Double"):
+                case ("double"):
                     if (l1.size() == l2.size())
                     {
                         for (int i = 0; i < l1.size(); i++)
@@ -1198,7 +1237,7 @@ namespace DATA_CONVERTER
                         return true;
                     }
                     break;
-                case ("System.String"):
+                case ("string"):
                     if (l1.size() == l2.size())
                     {
                         for (int i = 0; i < l1.size(); i++)
@@ -1214,7 +1253,7 @@ namespace DATA_CONVERTER
                         return true;
                     }
                     break;
-                case ("DATA_CONVERTER.list"):
+                case ("list"):
                     if (l1.size() == l2.size())
                     {
                         for (int i = 0; i < l1.size(); i++)

@@ -23,6 +23,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Net.Mail;
 using static jumpE_basic.base_runner;
 using System.Runtime.CompilerServices;
+using System.CodeDom;
 
 namespace jumpE_basic
 {
@@ -34,6 +35,7 @@ namespace jumpE_basic
             bool run = true;
             bool clear_lock = false;
             double floatingvar = 0;
+            string version = "0.1.5";
             data.setI("LNT", 0);
             while (run)
             {
@@ -105,7 +107,7 @@ namespace jumpE_basic
                 }*/
                 else if (hell == "help")
                 {
-                    Console.WriteLine("_-----------_ \n run \n clear \n refD \n refS \n add \n save \n clear lock \n ref \n folder \n_-----------_ ");
+                    Console.WriteLine("Version"+version+"\n_-----------_ \n run \n clear \n refD \n refS \n add \n save \n clear lock \n ref \n folder \n_-----------_ ");
                 }
                 /*else if (hell == "setS")
                 {
@@ -189,6 +191,18 @@ namespace jumpE_basic
                     string filename = Console.ReadLine();
                     filename += ".txt";
                     data.SaveToFile(filename);
+                }
+                else if(hell == ".")
+                {
+                    try
+                    {
+                        string hells = Console.ReadLine()+"\nend";
+                        base_runner bases = new base_runner(hells, data, "");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
                 else
                 {
@@ -458,6 +472,7 @@ namespace jumpE_basic
                 commands.Add("HS", new Hard_stop());
                 commands.Add("save", new save());
                 commands.Add("method", new Method_instantiate());
+                commands.Add("list",new listFunc());
                 // list all commands here :
                 // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function, bringDL, HS, 
                 // list all commands that refer to sheets here : 
@@ -1624,16 +1639,16 @@ namespace Imported_commands
                 {
                     if (code.Count() == 3)
                     {
-                        D.setlist(code[1], new list(getType(code[2])));
+                        D.setlist(code[1], new list(code[2]));
                         //this.commands.add_command(code[1], this.Math_equation);
                     }
-                    else if (code[4] == "=")
+                    else if (code[3] == "=")
                     {
-                        list l = new list(getType(code[3]));
+                        list l = new list(code[2]);
                         //split is between commas
                         List<List<string>> strings = new List<List<string>>();
                         List<string> codes = new List<string>();
-                        for(int i = 5; i < code.Count(); i++)
+                        for(int i = 4; i < code.Count(); i++)
                         {
                             if (code[i] == ",")
                             {
@@ -1645,14 +1660,21 @@ namespace Imported_commands
                                 codes.Add(code[i]);
                             }
                         }
-                        if (code[3] == "int" || code[3] == "double")
+                        if (code[2] == "int" )
+                        {
+                            for (int i = 0; i < strings.Count(); i++)
+                            {
+                                l.add((int)(doMath(strings[i].ToArray(), D, Base)));
+                            }
+                        }
+                        else if (code[2] == "double")
                         {
                             for (int i = 0; i < strings.Count(); i++)
                             {
                                 l.add(doMath(strings[i].ToArray(), D, Base));
                             }
                         }
-                        if (code[3]=="string")
+                        else if (code[2]=="string")
                         {
                             for(int i = 0;i<strings.Count();i++)
                             {
@@ -1660,7 +1682,7 @@ namespace Imported_commands
                                 l.add(strings[i].ToString());
                             }
                         }
-                        if (code[3]=="sheet")
+                        else if (code[2]=="sheet")
                         {
                             for(int i = 0;i<strings.Count();i++)
                             {
@@ -2330,6 +2352,79 @@ namespace Imported_commands
                     }
                     doMethod(D.referenceMethod(code[0]), args, D, Base);
                 }
+                if (D.islist(code[0]))
+                {
+
+                    if (code[1] == "add")
+                    {
+                        double j = doMath(code.Skip(2).ToArray(), D, Base);
+                        ((list)D.referenceVar(code[0])).add(j);
+                    }
+                    else
+                    {
+                        int index = 0;
+                        if (D.isnumvar(code[1]))
+                            index = (int)D.referenceVar(code[1]);
+                        else if (int.TryParse(code[1], out int valindex)) index = valindex;
+                        switch (((list)D.referenceVar(code[0])).t)
+                        {
+                            case ("int"):
+                                try
+                                {
+                                    double j = doMath(code.Skip(3).ToArray(), D, Base);
+                                    if (code[2] == "=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index,(int)j);
+
+                                    }
+                                    else if (code[2] == "+=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index)+j);
+                                        
+
+                                    }
+                                    else if (code[2] == "-=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) - j);
+
+                                    }
+                                    else if (code[2] == "*=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) * j);
+
+                                    }
+                                    else if (code[2] == "/=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) / j);
+
+                                    }
+                                    else if (code[2] == "++")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) + 1);
+                                    }
+                                    else if (code[2] == "--")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) - 1);
+                                    }
+                                    else if (code[2] == "**")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (int)((list)D.referenceVar(code[0])).get(index) * (int)((list)D.referenceVar(code[0])).get(index));
+                                    }
+                                }
+                                catch
+                                {
+                                    throw new Exception("Initialization error " + Base.position);
+                                }
+                                break;
+
+
+                        }
+                    }
+
+                }
 
             }
         }
@@ -2598,13 +2693,13 @@ namespace Imported_commands
                     q++;
                 }
                 Type t = getType(code[1]);
-                Dictionary<string,Object> list = new Dictionary<string,Object>();
+                Dictionary<string,Object> lists = new Dictionary<string,Object>();
                 for(int i = 4; i< code.Count; i+=2)
                 {
-                    list.Add(code[i-1], getType(code[i]));
+                    lists.Add(code[i-1], getType(code[i]));
                 }   
 
-                D.setMethod(code[1], args.ToArray(), t, list);
+                D.setMethod(code[1], args.ToArray(), t, lists);
                 
             }
         }
