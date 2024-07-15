@@ -1158,11 +1158,13 @@ namespace DATA_CONVERTER
         }
         public override String ToString()
         {
-            string returned = "";
-            foreach(object i in stuff)
+            string returned = "[";
+            for(int i = 0;i<size();i++)
             {
-                returned += stuff.ToString() + " ";
+                returned += stuff[i].ToString();
+                if (i != size() - 1) returned += ",";
             }
+            returned += "]";
             return returned;
         }
 

@@ -632,8 +632,12 @@ namespace jumpE_basic
                         }
                         else if (code[i] == "\"" && code[i + 2] == "\"")
                         {
-                            Message += (D.referenceVar(code[i + 1]));
 
+                            var msg = (D.referenceVar(code[i + 1]));
+                            if(msg.GetType() == typeof(list))
+                            {
+                                Message += ((list)msg).ToString();
+                            }else Message+= msg.ToString();
                             i += 2;
                         }
                         else if (code[i] == "!S!")
