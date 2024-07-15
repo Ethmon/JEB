@@ -300,7 +300,7 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key)||UNIQs.ContainsKey(key))
+            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key)||UNIQs.ContainsKey(key)||lists.ContainsKey(key))
             {
                 return true;
             }

@@ -2361,8 +2361,19 @@ namespace Imported_commands
 
                     if (code[1] == "add")
                     {
-                        double j = doMath(code.Skip(2).ToArray(), D, Base);
-                        ((list)D.referenceVar(code[0])).add(j);
+                        switch (((list)D.referenceVar(code[0])).t)
+                        {
+                            case ("int"):
+                                int j = (int)doMath(code.Skip(2).ToArray(), D, Base);
+                                ((list)D.referenceVar(code[0])).add(j);
+                                break;
+                            case ("double"):
+                                double sj = doMath(code.Skip(2).ToArray(), D, Base);
+                                ((list)D.referenceVar(code[0])).add(sj);
+                                break;
+                        }
+
+                        
                     }
                     else
                     {
@@ -2423,6 +2434,59 @@ namespace Imported_commands
                                     throw new Exception("Initialization error " + Base.position);
                                 }
                                 break;
+
+                            case ("double"):
+                                try
+                                {
+                                    double j = doMath(code.Skip(3).ToArray(), D, Base);
+                                    if (code[2] == "=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index, j);
+
+                                    }
+                                    else if (code[2] == "+=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) + j);
+
+
+                                    }
+                                    else if (code[2] == "-=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) - j);
+
+                                    }
+                                    else if (code[2] == "*=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) * j);
+
+                                    }
+                                    else if (code[2] == "/=")
+                                    {
+
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) / j);
+
+                                    }
+                                    else if (code[2] == "++")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) + 1);
+                                    }
+                                    else if (code[2] == "--")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) - 1);
+                                    }
+                                    else if (code[2] == "**")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) * (double)((list)D.referenceVar(code[0])).get(index));
+                                    }
+                                }
+                                catch
+                                {
+                                    throw new Exception("Initialization error " + Base.position);
+                                }
+                                break;
+
 
 
                         }
