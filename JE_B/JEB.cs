@@ -648,6 +648,12 @@ namespace jumpE_basic
                         {
                             Message += " ";
                         }
+                        else if (code[i] == "!L!")
+                        {
+                            Message += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                            i += 2;
+                        }
+
                         else if (code[i] == "\\!S!")
                         {
                             Message += "!S!";
@@ -2217,6 +2223,11 @@ namespace Imported_commands
                             {
                                 mesage += " ";
                             }
+                            else if (code[i] == "!L!")
+                            {
+                                mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                                i += 2;
+                            }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
 
@@ -2251,6 +2262,10 @@ namespace Imported_commands
                             else if (code[i] == "!S!")
                             {
                                 mesage += " ";
+                            }
+                            else if (code[i] == "!L!")
+                            {
+                                mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
@@ -2423,6 +2438,11 @@ namespace Imported_commands
                                     {
                                         mesage += " ";
                                     }
+                                    else if (code[i] == "!L!")
+                                    {
+                                        mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int jl) ? jl : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                                        i += 2;
+                                    }
                                     else if (code[i] == "M#" && code[i + 1] == "#")
                                     {
                                         List<string> codes = new List<string>();
@@ -2574,6 +2594,11 @@ namespace Imported_commands
                                         else if (code[i] == "!S!")
                                         {
                                             mesage += " ";
+                                        }
+                                        else if (code[i] == "!L!")
+                                        {
+                                            mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                                            i += 2;
                                         }
                                         else if (code[i] == "M#" && code[i + 1] == "#")
                                         {
@@ -2928,6 +2953,13 @@ namespace Imported_commands
                 else if (D.isnumvar(equation[i].ToString()))
                 {
                     equationa += D.referenceVar(equation[i].ToString()) + " ";
+                }
+                else if (equation[i] == "!L!")
+                {
+                    
+                    var d = ((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))));
+                    equationa += d;
+                    i += 2;
                 }
                 else if (equation[i] == "!F!")
                 {
