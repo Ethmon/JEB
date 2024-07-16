@@ -35,7 +35,7 @@ namespace jumpE_basic
             bool run = true;
             bool clear_lock = false;
             double floatingvar = 0;
-            string version = "0.1.5";
+            string version = "0.1.6";
             data.setI("LNT", 0);
             while (run)
             {
@@ -107,7 +107,7 @@ namespace jumpE_basic
                 }*/
                 else if (hell == "help")
                 {
-                    Console.WriteLine("Version"+version+"\n_-----------_ \n run \n clear \n refD \n refS \n add \n save \n clear lock \n ref \n folder \n_-----------_ ");
+                    Console.WriteLine("Version"+version+"\n_-----------_ \n run \n clear \n refD \n refS \n add \n save \n clear lock \n ref \n folder \n showall\n_-----------_ ");
                 }
                 /*else if (hell == "setS")
                 {
@@ -192,6 +192,10 @@ namespace jumpE_basic
                     filename += ".txt";
                     data.SaveToFile(filename);
                 }
+                else if(hell == "showall")
+                {
+                    Console.WriteLine(data.ToString());
+                }
                 else if(hell == ".")
                 {
                     try
@@ -204,9 +208,10 @@ namespace jumpE_basic
                         Console.WriteLine(e);
                     }
                 }
+
                 else
                 {
-                    Console.WriteLine("NOT A COMMAND");
+                    //Console.WriteLine("NOT A COMMAND");
                 }
 
             }
@@ -242,7 +247,6 @@ namespace jumpE_basic
             this.run = true;
             datas.Add(data);
             data.setI("LNT", 0);
-
             while (this.run)
             {
                 if (debg)

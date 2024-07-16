@@ -206,6 +206,53 @@ namespace DATA_CONVERTER
                 sheets.Add(key, d);
             }
         }
+        public override string ToString()
+        {
+            string mama = "";
+            foreach(var kvp in strings)
+            {
+                mama += kvp.Key + "=" + kvp.Value + ":string|\n";
+            }
+            foreach (var kvp in doubles)
+            {
+                mama += kvp.Key + "=" + kvp.Value + ":double|\n";
+            }
+            foreach (var kvp in integers)
+            {
+                mama += kvp.Key + "=" + kvp.Value + ":int|\n";
+            }
+            foreach (var kvp in lines)
+            {
+                mama += kvp.Key + "=" + kvp.Value.get_line_number() + ":line|\n";
+            }
+            foreach (var kvp in functions)
+            {
+                mama += kvp.Key + "=" + kvp.Value.get_start_int() + ":" + kvp.Value.get_end_int() + ":function|\n";
+            }
+            foreach (var kvp in files)
+            {
+                mama += kvp.Key + "=" + kvp.Value.get_file_path() + ":file|\n";
+            }
+            foreach (var kvp in sheets)
+            {
+                mama += kvp.Key + "=" + kvp.Value.identifier + ":sheet|\n";
+            }
+            foreach(var kvp in methods)
+            {
+                mama += kvp.Key + "=" + kvp.Value.get_code() + ":" + kvp.Value.get_type() + ":" + kvp.Value.get_args() + ":method|\n";
+            }
+            foreach(var kvp in UNIQs)
+            {
+                mama += kvp.Key + "=" + kvp.Value + ":UNIQ|\n";
+            }
+            foreach(var kvp in lists)
+            {
+                mama += kvp.Key + "=" + kvp.Value + ":list|\n";
+            }
+            return mama;
+
+
+        }
 
         private static string DictionaryToString<T>(Dictionary<string, T> dictionary,string type)
         {
