@@ -35,7 +35,7 @@ namespace jumpE_basic
             bool run = true;
             bool clear_lock = false;
             double floatingvar = 0;
-            string version = "0.1.6";
+            string version = "0.2.0";
             data.setI("LNT", 0);
             while (run)
             {
