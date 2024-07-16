@@ -641,7 +641,7 @@ namespace jumpE_basic
                             if(msg.GetType() == typeof(list))
                             {
                                 Message += ((list)msg).ToString();
-                            }else Message+= msg.ToString();
+                            }else Message+= msg;
                             i += 2;
                         }
                         else if (code[i] == "!S!")
@@ -1684,10 +1684,45 @@ namespace Imported_commands
                         }
                         else if (code[2]=="string")
                         {
-                            for(int i = 0;i<strings.Count();i++)
+                            for(int ik = 0;ik<strings.Count();ik++)
                             {
-                                
-                                l.add(strings[i].ToString());
+                                {
+                                    string mesage = "";
+                                    for (int i = 0; i < strings[ik].Count(); i++)
+                                    {
+                                        if (strings[ik][i] == "\"" && strings[ik][i + 2] == "\"")
+                                        {
+                                            mesage += D.referenceVar(code[i + 1]);
+                                            i += 2;
+                                        }
+                                        else if (strings[ik][i] == "!S!")
+                                        {
+                                            mesage += " ";
+                                        }
+                                        else if (strings[ik][i] == "M#" && strings[ik][i + 1] == "#")
+                                        {
+
+                                            List<string> codess = new List<string>();
+                                            for (int ll = i; ll < strings[ik].Count; ll++)
+                                            {
+                                                if (strings[ik][ll] == "#" && strings[ik][ll + 1] == "#M")
+                                                {
+                                                    i = ll + 1;
+                                                    break;
+                                                }
+                                                codess.Add(strings[ik][ll]);
+                                            }
+                                            mesage += doMath(codess.ToArray(), D, Base);
+                                        }
+                                        else
+                                        {
+                                            mesage += strings[ik][i];
+                                            i++;
+                                        }
+                                    }
+                                    l.add(mesage);
+                                }
+
                             }
                         }
                         else if (code[2]=="sheet")
@@ -2375,6 +2410,41 @@ namespace Imported_commands
                                 double sj = doMath(code.Skip(2).ToArray(), D, Base);
                                 ((list)D.referenceVar(code[0])).add(sj);
                                 break;
+                            case ("string"):
+                                string mesage = "";
+                                for (int i = 2; i < code.Count(); i++)
+                                {
+                                    if (code[i] == "\"" && code[i + 2] == "\"")
+                                    {
+                                        mesage += D.referenceVar(code[i + 1]);
+                                        i += 2;
+                                    }
+                                    else if (code[i] == "!S!")
+                                    {
+                                        mesage += " ";
+                                    }
+                                    else if (code[i] == "M#" && code[i + 1] == "#")
+                                    {
+                                        List<string> codes = new List<string>();
+                                        for (int ll = i; ll < code.Count; ll++)
+                                        {
+                                            if (code[ll] == "#" && code[ll + 1] == "#M")
+                                            {
+                                                i = ll + 1;
+                                                break;
+                                            }
+                                            codes.Add(code[ll]);
+                                        }
+                                        mesage += doMath(codes.ToArray(), D, Base);
+                                    }
+                                    else
+                                    {
+                                        mesage += code[i];
+                                        i++;
+                                    }
+                                }
+                                ((list)D.referenceVar(code[0])).add(mesage);
+                                break;
                         }
 
                         
@@ -2483,6 +2553,56 @@ namespace Imported_commands
                                     else if (code[2] == "**")
                                     {
                                         ((list)D.referenceVar(code[0])).set(index, (double)((list)D.referenceVar(code[0])).get(index) * (double)((list)D.referenceVar(code[0])).get(index));
+                                    }
+                                }
+                                catch
+                                {
+                                    throw new Exception("Initialization error " + Base.position);
+                                }
+                                break;
+                            case ("string"):
+                                try
+                                {
+                                    string mesage = "";
+                                    for (int i = 3; i < code.Count(); i++)
+                                    {
+                                        if (code[i] == "\"" && code[i + 2] == "\"")
+                                        {
+                                            mesage += D.referenceVar(code[i + 1]);
+                                            i += 2;
+                                        }
+                                        else if (code[i] == "!S!")
+                                        {
+                                            mesage += " ";
+                                        }
+                                        else if (code[i] == "M#" && code[i + 1] == "#")
+                                        {
+
+                                            List<string> codes = new List<string>();
+                                            for (int ll = i; ll < code.Count; ll++)
+                                            {
+                                                if (code[ll] == "#" && code[ll + 1] == "#M")
+                                                {
+                                                    i = ll + 1;
+                                                    break;
+                                                }
+                                                codes.Add(code[ll]);
+                                            }
+                                            mesage += doMath(codes.ToArray(), D, Base);
+                                        }
+                                        else
+                                        {
+                                            mesage += code[i];
+                                            i++;
+                                        }
+                                    }
+                                    if (code[2] == "=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, mesage);
+                                    }
+                                    else if (code[2] == "+=")
+                                    {
+                                        ((list)D.referenceVar(code[0])).set(index, ((list)D.referenceVar(code[0])).get(index) + mesage);
                                     }
                                 }
                                 catch
