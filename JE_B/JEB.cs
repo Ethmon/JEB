@@ -35,7 +35,7 @@ namespace jumpE_basic
             bool run = true;
             bool clear_lock = false;
             double floatingvar = 0;
-            string version = "0.2.0";
+            string version = "0.2.2";
             data.setI("LNT", 0);
             while (run)
             {
@@ -477,6 +477,7 @@ namespace jumpE_basic
                 commands.Add("save", new save());
                 commands.Add("method", new Method_instantiate());
                 commands.Add("list",new listFunc());
+                commands.Add("<><", new set_Return());
                 // list all commands here :
                 // return, Return , RETURN, <<, when, When, if, useC, usec, print, Print, inputI, inputi, InputI, inputS, inputs, InputS, string, String, STRING, int, INT, whenS, WhenS, jump, jp, JP, JUMP, double, DOUBLE, Double, end, stop, END, inputD, inputd, InputD, use, line_number, ln, LN, comment, //, #, raise, push, pop, IDD, IDT, free, skip, sideLayer, remL, callLayer, bring, raiseS, raiseSA, bringA, pushA, pushDL, Line, File, Function, bringDL, HS, 
                 // list all commands that refer to sheets here : 
@@ -1026,6 +1027,10 @@ namespace jumpE_basic
                 else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
                 {
                     D.setsheet(code[1], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
+                }
+                else if (Base.datas[Base.datas.Count - 2].islist(code[1]))
+                {
+                    D.setlist(code[1], (list)Base.datas[Base.datas.Count - 2].referenceVar(code[1]));
                 }
                 //adding lines functions and files
 
@@ -2879,7 +2884,48 @@ namespace Imported_commands
         }*/
 
 
-
+        public class set_Return : command_centrall
+        {
+            public override void Execute(List<string> code, Data D, base_runner Base)
+            {
+                if (D.inint(code[1]))
+                {
+                    Base.return_value = D.referenceI(code[1]);
+                }
+                else if (D.indouble(code[1]))
+                {
+                    Base.return_value = D.referenceD(code[1]);
+                }
+                else if (D.instring(code[1]))
+                {
+                    Base.return_value = D.referenceS(code[1]);
+                }
+                else if (D.isLine(code[1]))
+                {
+                    Base.return_value = D.referenceLine(code[1]);
+                }
+                else if (D.isFunction(code[1]))
+                {
+                    Base.return_value = D.referenceFunction(code[1]);
+                }
+                else if (D.isFile(code[1]))
+                {
+                    Base.return_value = D.referenceFile(code[1]);
+                }
+                else if (D.isMethod(code[1]))
+                {
+                    Base.return_value = D.referenceMethod(code[1]);
+                }
+                else if (D.islist(code[1]))
+                {
+                    Base.return_value = D.referenceVar(code[1]);
+                }
+                else if (double.TryParse(code[1], out double j))
+                {
+                    Base.return_value = j;
+                }
+            }
+        }
         public class Method_instantiate : command_centrall
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
@@ -2956,12 +3002,12 @@ namespace Imported_commands
                 }
                 else if (equation[i] == "!L!")
                 {
-                    
+                    if (equation[i + 2] == "size") { equationa += (((list)D.referenceVar(equation[i + 1]))).size()+ " ";i += 2;continue; }
                     var d = ((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))));
-                    equationa += d;
+                    equationa += d + " ";
                     i += 2;
                 }
-                else if (equation[i] == "!F!")
+                else if (equation[i] == "!M!")
                 {
                     object[] args = new object[D.referenceMethod(equation[i + 1]).get_args().Count()];
                     for(int j = i+2; j < D.referenceMethod(equation[i+1]).get_args().Count() + i + 2; j++)
