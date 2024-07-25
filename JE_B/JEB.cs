@@ -2065,7 +2065,9 @@ namespace Imported_commands
             {
                 if (code.Count() == 3)
                 {
-                    D.setFile(code[1], new file(code[2], D));
+                    D.setFile(code[1], new file(Base.localPath + "\\" +  code[2], D));
+                    //Console.WriteLine("File created");
+                    //Console.WriteLine("File path: " + Base.localPath + "\\" + code[2]);
                 }
                 else if (code.Count() == 4)
                 {
