@@ -633,7 +633,7 @@ namespace jumpE_basic
                         }
                         else if (code[i] == "\\n")
                         {
-                            Console.WriteLine();
+                            Message += "\n";
                         }
                         else if (code[i] == "\"" && code[i + 2] == "\"")
                         {
@@ -2233,6 +2233,10 @@ namespace Imported_commands
                                 mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
                                 i += 2;
                             }
+                            else if (code[i] == "\n")
+                            {
+                                mesage += "\n";
+                            }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
 
@@ -2271,6 +2275,10 @@ namespace Imported_commands
                             else if (code[i] == "!L!")
                             {
                                 mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                            }
+                            else if (code[i] == "\n")
+                            {
+                                mesage += "\n";
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
@@ -2443,6 +2451,10 @@ namespace Imported_commands
                                     {
                                         mesage += " ";
                                     }
+                                    else if (code[i] == "\n")
+                                    {
+                                        mesage += "\n";
+                                    }
                                     else if (code[i] == "!L!")
                                     {
                                         mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int jl) ? jl : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
@@ -2600,6 +2612,10 @@ namespace Imported_commands
                                         {
                                             mesage += " ";
                                         }
+                                        else if (code[i] == "\n")
+                                        {
+                                            mesage += "\n";
+                                        }
                                         else if (code[i] == "!L!")
                                         {
                                             mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
@@ -2683,6 +2699,10 @@ namespace Imported_commands
                             else if (code[i] == "!S!")
                             {
                                 mesage += " ";
+                            }
+                            else if (code[i]=="\n")
+                            {
+                                mesage += "\n";
                             }
                             else if (code[i] == "M#" && code[i + 1] == "#")
                             {
