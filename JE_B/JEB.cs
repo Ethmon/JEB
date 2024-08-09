@@ -1479,7 +1479,7 @@ using System.Text;
 using System.Windows;
 using System.IO;
 using System.Collections.Generic;
-namespace Imported_commands 
+namespace jumpE_basic 
 {{ 
             {fileContent}
 }}";
@@ -1565,9 +1565,9 @@ using System.IO;
 using Jace;
 using System.Windows;
 using System.Collections.Generic;
-namespace Imported_commands 
+namespace jumpE_basic  
 {{ 
-    public class {className} : DATA_CONVERTER.outer_commands 
+    public class {className} : command_centrall
     {{ 
         public override void Execute(List<string> code, Data D)
         {{
