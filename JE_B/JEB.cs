@@ -35,7 +35,7 @@ namespace jumpE_basic
             bool run = true;
             bool clear_lock = false;
             double floatingvar = 0;
-            string version = "0.2.2";
+            string version = "0.2.3";
             data.setI("LNT", 0);
             while (run)
             {
@@ -470,7 +470,7 @@ namespace jumpE_basic
                 commands.Add("bringA", new bringA()); commands.Add("pushA", new pushA());
                 commands.Add("pushDL", new pushDL());
                 commands.Add("Line", new Line_func(Math_equation, this));
-                commands.Add("File", new File_func());
+                commands.Add("file", new File_func());
                 commands.Add("Function", new Function_func(Math_equation, this));
                 commands.Add("bringDL", new bringDL());
                 commands.Add("HS", new Hard_stop());
@@ -2065,7 +2065,9 @@ namespace jumpE_basic
             {
                 if (code.Count() == 3)
                 {
-                    D.setFile(code[1], new file(code[2], D));
+                    D.setFile(code[1], new file(Base.localPath + "\\" +  code[2], D));
+                    //Console.WriteLine("File created");
+                    //Console.WriteLine("File path: " + Base.localPath + "\\" + code[2]);
                 }
                 else if (code.Count() == 4)
                 {
