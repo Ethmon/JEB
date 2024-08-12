@@ -237,9 +237,11 @@ namespace jumpE_basic
         //public string data_storage = "@";
         private new pre_defined_variable f = new pre_defined_variable();
         public string localPath = "";
-
+        public Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>> Mathss = new Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>>();
         public base_runner(string taken, DATA_CONVERTER.Data data, string localPath)
         {
+            Mathss.Add("!L!", getfromlist);
+            Mathss.Add("!M!", getfrommethod);
             this.taken_in_string = taken;
             this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
             this.localPath = localPath;
@@ -649,10 +651,12 @@ namespace jumpE_basic
                         {
                             Message += " ";
                         }
-                        else if (code[i] == "!L!")
+                        else if (Base.Mathss.ContainsKey(code[i]))
                         {
-                            Message += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
-                            i += 2;
+                            string[] bbb = Base.Mathss[code[i]](code.ToArray(), D, Base, i, 0);
+                            Message += bbb[0];
+                            i += int.Parse(bbb[1]);
+
                         }
 
                         else if (code[i] == "\\!S!")
@@ -757,24 +761,7 @@ namespace jumpE_basic
                             Console.Write(Message);
                             Message = "";
                         }
-                        else if (code[i] == "M#" && code[i + 1] == "#")
-                        {
-                            List<string> codes = new List<string>();
-                            for (int ll = i; ll < code.Count; ll++)
-                            {
-                                if (code[ll] == "#" && code[ll + 1] == "#M")
-                                {
-                                    i = ll + 1;
-                                    break;
-                                }
-                                codes.Add(code[ll]);
-                            }
-                            Message += doMath(codes.ToArray(), D, Base);
-                        }
-                        else
-                        {
-                            Message += (code[i]);
-                        }
+                        
 
                     }
                     Console.Write(Message);
@@ -1743,6 +1730,13 @@ namespace jumpE_basic
                                 l.add(D.referenceSheet(strings[i].ToString()));
                             }
                         }
+                        else if (code[2]== "list")
+                        {
+                            for (int i = 0; i < strings.Count(); i++)
+                            {
+                                l.add((list)D.referenceVar(strings[i][0]));
+                            }
+                        }
 
 
 
@@ -2484,6 +2478,9 @@ namespace jumpE_basic
                                 }
                                 ((list)D.referenceVar(code[0])).add(mesage);
                                 break;
+                            case ("list"):
+                                ((list)D.referenceVar(code[0])).add((list)D.referenceVar(code[2]));
+                                break;
                         }
 
                         
@@ -3007,6 +3004,64 @@ namespace jumpE_basic
                     return typeof(void);
             }
         }
+        public static string[] getfromlist2(string[] equation, Data D, base_runner Base, int i, int k,list a)
+        {
+            string equationa = "";
+            k += 2;
+            if (equation[i] == "size") { equationa += a.size();}
+            else if (a.t == "list")
+            {
+                string[] equationb = getfromlist2(equation, D, Base, i+1, k + 1,(list)a.get((int.TryParse(equation[i], out int j) ? j : ((D.isnumvar(equation[i]) ? ((D.inint(equation[i]) ? D.referenceI(equation[i]) : ((int)D.referenceD(equation[i])))) : throw new ArgumentException("error with lists"))))));
+                equationa += equationb[0];
+                k = int.Parse(equationb[1]) - 2;
+            }
+            else
+            {
+                var d = a.get((int.TryParse(equation[i], out int j) ? j : ((D.isnumvar(equation[i]) ? ((D.inint(equation[i]) ? D.referenceI(equation[i]) : ((int)D.referenceD(equation[i])))) : throw new ArgumentException("error with lists")))));
+                equationa += d;
+            }
+
+            string[] f = { equationa, (k).ToString() };
+            return f;
+        }
+        public static string[] getfromlist(string[] equation, Data D, base_runner Base, int i,int k)
+        {
+            string equationa = "";
+            k+=2;
+            if (equation[i + 2] == "size") { equationa += (((list)D.referenceVar(equation[i + 1]))).size(); k = 2; }
+            else if (D.islist(equation[i + 1])&&((list)D.referenceVar(equation[i+1])).t=="list")
+            {
+                
+                string[] equationb = getfromlist2(equation, D, Base, i+3, k+1, (list)(((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))))));
+                equationa += equationb[0];
+                k = int.Parse(equationb[1])-2;
+            }
+            else
+            {
+                var d = ((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))));
+                equationa += d;
+            }
+                
+            string[] f = { equationa, (k).ToString() };
+            return f;
+        }
+        public static string[] getfrommethod(string[] equation, Data D, base_runner Base, int i, int k)
+        {
+            string equationa = "";
+            object[] args = new object[D.referenceMethod(equation[i + 1]).get_args().Count()];
+            for (int j = i + 2; j < D.referenceMethod(equation[i + 1]).get_args().Count() + i + 2; j++)
+            {
+                args[j - i - 2] = D.referenceVar(equation[j]);
+            }
+            k = D.referenceMethod(equation[i + 1]).get_args().Count() + 1;
+            if (doMethod(D.referenceMethod(equation[i + 1]), args, D, Base) == null)
+            {
+                return new string[] { "null", k.ToString() };
+            }
+            equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D, Base);
+            return new string[] { equationa, k.ToString() };
+        }
+        
         public static double doMath(string[] equation, Data D, base_runner Base)
         {
             IDictionary<string, double> drict = new Dictionary<string, double>();
@@ -3022,26 +3077,11 @@ namespace jumpE_basic
                 {
                     equationa += D.referenceVar(equation[i].ToString()) + " ";
                 }
-                else if (equation[i] == "!L!")
+                else if (Base.Mathss.ContainsKey(equation[i]))
                 {
-                    if (equation[i + 2] == "size") { equationa += (((list)D.referenceVar(equation[i + 1]))).size()+ " ";i += 2;continue; }
-                    var d = ((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))));
-                    equationa += d + " ";
-                    i += 2;
-                }
-                else if (equation[i] == "!M!")
-                {
-                    object[] args = new object[D.referenceMethod(equation[i + 1]).get_args().Count()];
-                    for(int j = i+2; j < D.referenceMethod(equation[i+1]).get_args().Count() + i + 2; j++)
-                    {
-                        args[j - i - 2] = D.referenceVar(equation[j]);
-                    }
-                    i = i + D.referenceMethod(equation[i + 1]).get_args().Count() + 1;
-                    if (doMethod(D.referenceMethod(equation[i + 1]), args, D,Base) == null)
-                    {
-                        continue;
-                    }
-                    equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D, Base);
+                   string[] equationb = Base.Mathss[equation[i]](equation, D, Base, i,0);
+                    equationa += equationb[0] + " ";
+                    i += int.Parse(equationb[1]);
                 }
                 else if (double.TryParse(equation[i],out double k))
                 {
