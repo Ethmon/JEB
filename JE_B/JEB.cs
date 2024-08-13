@@ -24,6 +24,7 @@ using System.Net.Mail;
 using static jumpE_basic.base_runner;
 using System.Runtime.CompilerServices;
 using System.CodeDom;
+using System.Diagnostics.Eventing.Reader;
 
 namespace jumpE_basic
 {
@@ -237,11 +238,10 @@ namespace jumpE_basic
         //public string data_storage = "@";
         private new pre_defined_variable f = new pre_defined_variable();
         public string localPath = "";
-        public Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>> Mathss = new Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>>();
+        public static Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>> Mathss = new Dictionary<string, Func<string[], Data, base_runner, int, int, string[]>>() { { "!L!", getfromlist },{ "!M!", getfrommethod }, {"!S!",spawningspace } };
         public base_runner(string taken, DATA_CONVERTER.Data data, string localPath)
         {
-            Mathss.Add("!L!", getfromlist);
-            Mathss.Add("!M!", getfrommethod);
+            
             this.taken_in_string = taken;
             this.lines = SimpleTokenizer.Linizer(this.taken_in_string);
             this.localPath = localPath;
@@ -647,13 +647,9 @@ namespace jumpE_basic
                             }else Message+= msg;
                             i += 2;
                         }
-                        else if (code[i] == "!S!")
+                        else if (Mathss.ContainsKey(code[i]))
                         {
-                            Message += " ";
-                        }
-                        else if (Base.Mathss.ContainsKey(code[i]))
-                        {
-                            string[] bbb = Base.Mathss[code[i]](code.ToArray(), D, Base, i, 0);
+                            string[] bbb = Mathss[code[i]](code.ToArray(), D, Base, i, 0);
                             Message += bbb[0];
                             i += int.Parse(bbb[1]);
 
@@ -1342,31 +1338,33 @@ namespace jumpE_basic
 
                         else
                         {
-                            for (int i = 1; i < statments[iff].Count(); i++)
-                            {
-                                double j;
-                                if (Double.TryParse(statments[iff][i], out j))
-                                {
-                                    equation += j + " ";
-                                }
-                                else if (statments[iff][i] == "+" || statments[iff][i] == "-" || statments[iff][i] == "/" || statments[iff][i] == "*" || statments[iff][i] == "sin" || statments[iff][i] == "cos" || statments[iff][i] == "tan" ||
-                                statments[iff][i] == "csc" || statments[iff][i] == "sec" || statments[iff][i] == "cot" || statments[iff][i] == "root" || statments[iff][i] == ")" || statments[iff][i] == "(" || statments[iff][i] == " " || statments[iff][i] == "==" || statments[iff][i] == "!=" || statments[iff][i] == ">" || statments[iff][i] == "<" ||
-                                statments[iff][i] == "=>" || statments[iff][i] == "=<" || statments[iff][i] == "!")
-                                {
-                                    equation += statments[iff][i] + " ";
-                                }
-                                else if (D.isnumvar(statments[iff][i]))
-                                {
-                                    equation += D.referenceVar(statments[iff][i]) + " ";
-                                }
-                                else
-                                {
-                                    equation += statments[iff][i] + " ";
-                                    //Debug.WriteLine("not recognized when statement");
-                                }
-                            }
-                            CalculationEngine engine = new CalculationEngine();
-                            result = Convert.ToBoolean(engine.Calculate(equation));
+                            string[] strings = statments[iff].Skip(1).ToArray();
+                            result = doMathbool(strings, D, Base);
+                            //for (int i = 1; i < statments[iff].Count(); i++)
+                            //{
+                            //    double j;
+                            //    if (Double.TryParse(statments[iff][i], out j))
+                            //    {
+                            //        equation += j + " ";
+                            //    }
+                            //    else if (statments[iff][i] == "+" || statments[iff][i] == "-" || statments[iff][i] == "/" || statments[iff][i] == "*" || statments[iff][i] == "sin" || statments[iff][i] == "cos" || statments[iff][i] == "tan" ||
+                            //    statments[iff][i] == "csc" || statments[iff][i] == "sec" || statments[iff][i] == "cot" || statments[iff][i] == "root" || statments[iff][i] == ")" || statments[iff][i] == "(" || statments[iff][i] == " " || statments[iff][i] == "==" || statments[iff][i] == "!=" || statments[iff][i] == ">" || statments[iff][i] == "<" ||
+                            //    statments[iff][i] == "=>" || statments[iff][i] == "=<" || statments[iff][i] == "!")
+                            //    {
+                            //        equation += statments[iff][i] + " ";
+                            //    }
+                            //    else if (D.isnumvar(statments[iff][i]))
+                            //    {
+                            //        equation += D.referenceVar(statments[iff][i]) + " ";
+                            //    }
+                            //    else
+                            //    {
+                            //        equation += statments[iff][i] + " ";
+                            //        //Debug.WriteLine("not recognized when statement");
+                            //    }
+                            //}
+                            //CalculationEngine engine = new CalculationEngine();
+                            //result = Convert.ToBoolean(engine.Calculate(equation));
                             //Console.WriteLine(result);
 
                             if (statments[iff][0] == "or" || statments[iff][0] == "nor")
@@ -2220,14 +2218,11 @@ namespace jumpE_basic
                                 mesage += D.referenceVar(code[i + 1]);
                                 i += 2;
                             }
-                            else if (code[i] == "!S!")
+                            else if (Mathss.ContainsKey(code[i]))
                             {
-                                mesage += " ";
-                            }
-                            else if (code[i] == "!L!")
-                            {
-                                mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
-                                i += 2;
+                                string[] mess = Mathss[code[i]](code.ToArray(), D, Base, i, 0);
+                                mesage += mess[0];
+                                i += int.Parse(mess[1]);
                             }
                             else if (code[i] == "\n")
                             {
@@ -2251,7 +2246,7 @@ namespace jumpE_basic
                             else
                             {
                                 mesage += code[i];
-                                i++;
+                               // i++;
                             }
                         }
                     }
@@ -2264,13 +2259,11 @@ namespace jumpE_basic
                                 mesage += D.referenceVar(code[i + 1]);
                                 i += 2;
                             }
-                            else if (code[i] == "!S!")
+                            else if (Mathss.ContainsKey(code[i]))
                             {
-                                mesage += " ";
-                            }
-                            else if (code[i] == "!L!")
-                            {
-                                mesage += ((list)D.referenceVar(code[i + 1])).get((int.TryParse(code[i + 2], out int j) ? j : ((D.isnumvar(code[i + 2]) ? ((D.inint(code[i + 2]) ? D.referenceI(code[i + 2]) : ((int)D.referenceD(code[i + 2])))) : throw new ArgumentException("error with lists")))));
+                                string[] mess = Mathss[code[i]](code.ToArray(), D, Base, i, 0);
+                                mesage += mess[0];
+                                i += int.Parse(mess[1]);
                             }
                             else if (code[i] == "\n")
                             {
@@ -2293,7 +2286,7 @@ namespace jumpE_basic
                             else
                             {
                                 mesage += code[i];
-                                i++;
+                               // i++;
                             }
                         }
                     }
@@ -2421,8 +2414,18 @@ namespace jumpE_basic
                 }
                 if (D.islist(code[0]))
                 {
-
-                    if (code[1] == "add")
+                    if (code[1] == "remove")
+                    { 
+                        if (D.isnumvar(code[2]))
+                            ((list)D.referenceVar(code[0])).remove((int)D.referenceVar(code[2]));
+                        else if (int.TryParse(code[2], out int valindex)) ((list)D.referenceVar(code[0])).remove(valindex);
+                    }
+                    else if (code[1] == "clear")
+                    {
+                        ((list)D.referenceVar(code[0])).clear();
+                    }
+                    
+                    else if (code[1] == "add")
                     {
                         switch (((list)D.referenceVar(code[0])).t)
                         {
@@ -2479,6 +2482,11 @@ namespace jumpE_basic
                                 ((list)D.referenceVar(code[0])).add(mesage);
                                 break;
                             case ("list"):
+                                if (Mathss.ContainsKey(code[2]))
+                                {
+                                    string[] eee = Mathss[code[2]](code.ToArray(), D, Base, 2, 0);
+                                    ((list)D.referenceVar(code[0])).add(list.stringtolist(eee[0]));
+                                }
                                 ((list)D.referenceVar(code[0])).add((list)D.referenceVar(code[2]));
                                 break;
                         }
@@ -2695,10 +2703,13 @@ namespace jumpE_basic
                                 i += 2;
 
                             }
-                            else if (code[i] == "!S!")
+                            else if (Mathss.ContainsKey(code[i]))
                             {
-                                mesage += " ";
+                                string[] mess = Mathss[code[i]](code.ToArray(), D, Base, i, 0);
+                                mesage += mess[0];
+                                i += int.Parse(mess[1]);
                             }
+
                             else if (code[i]=="\n")
                             {
                                 mesage += "\n";
@@ -2720,7 +2731,7 @@ namespace jumpE_basic
                             else
                             {
                                 mesage += code[i];
-                                i++;
+                                //i++;
                             }
                         }
                         D.setS(code[1], mesage);
@@ -2974,11 +2985,11 @@ namespace jumpE_basic
                     }
                     q++;
                 }
-                Type t = getType(code[1]);
+                Type t = getType(code[2]);
                 Dictionary<string,Object> lists = new Dictionary<string,Object>();
-                for(int i = 4; i< code.Count; i+=2)
+                for(int i = 3; i< code.Count; i+=2)
                 {
-                    lists.Add(code[i-1], getType(code[i]));
+                    lists.Add(code[i+1], getType(code[i]));
                 }   
 
                 D.setMethod(code[1], args.ToArray(), t, lists);
@@ -3009,8 +3020,13 @@ namespace jumpE_basic
             string equationa = "";
             k += 2;
             if (equation[i] == "size") { equationa += a.size();}
+            else if (equation[i] == "|")
+            {
+                return new string[] { a.ToString(), (k).ToString() };
+            }
             else if (a.t == "list")
             {
+                
                 string[] equationb = getfromlist2(equation, D, Base, i+1, k + 1,(list)a.get((int.TryParse(equation[i], out int j) ? j : ((D.isnumvar(equation[i]) ? ((D.inint(equation[i]) ? D.referenceI(equation[i]) : ((int)D.referenceD(equation[i])))) : throw new ArgumentException("error with lists"))))));
                 equationa += equationb[0];
                 k = int.Parse(equationb[1]) - 2;
@@ -3031,7 +3047,11 @@ namespace jumpE_basic
             if (equation[i + 2] == "size") { equationa += (((list)D.referenceVar(equation[i + 1]))).size(); k = 2; }
             else if (D.islist(equation[i + 1])&&((list)D.referenceVar(equation[i+1])).t=="list")
             {
-                
+                if (equation[i+2] == "|")
+                {
+                    return new string[] { ((list)D.referenceVar(equation[i + 1])).ToString(), (k).ToString() };
+                }
+
                 string[] equationb = getfromlist2(equation, D, Base, i+3, k+1, (list)(((list)D.referenceVar(equation[i + 1])).get((int.TryParse(equation[i + 2], out int j) ? j : ((D.isnumvar(equation[i + 2]) ? ((D.inint(equation[i + 2]) ? D.referenceI(equation[i + 2]) : ((int)D.referenceD(equation[i + 2])))) : throw new ArgumentException("error with lists")))))));
                 equationa += equationb[0];
                 k = int.Parse(equationb[1])-2;
@@ -3044,6 +3064,10 @@ namespace jumpE_basic
                 
             string[] f = { equationa, (k).ToString() };
             return f;
+        }
+        public static string[] spawningspace(string[] equation, Data D, base_runner Base, int i, int k)
+        {
+            return new string[] { " ", "0" };
         }
         public static string[] getfrommethod(string[] equation, Data D, base_runner Base, int i, int k)
         {
@@ -3061,7 +3085,37 @@ namespace jumpE_basic
             equationa += doMethod(D.referenceMethod(equation[i + 1]), args, D, Base);
             return new string[] { equationa, k.ToString() };
         }
-        
+        public static bool doMathbool(string[] equation, Data D, base_runner Base)
+        {
+            IDictionary<string, double> drict = new Dictionary<string, double>();
+            string equationa = "";
+            for (int i = 0; i < equation.Length; i++)
+            {
+                if (equation[i] == "+" || equation[i] == "-" || equation[i] == "==" || equation[i] == "/" || equation[i] == "*" || equation[i] == "sin" || equation[i] == "cos" || equation[i] == "tan" ||
+                                       equation[i] == "csc" || equation[i] == "sec" || equation[i] == "%" || equation[i] == "cot" || equation[i] == "root" || equation[i] == ")" || equation[i] == "(" || equation[i] == " ")
+                {
+                    equationa += equation[i] + " ";
+                }
+                else if (D.isnumvar(equation[i].ToString()))
+                {
+                    equationa += D.referenceVar(equation[i].ToString()) + " ";
+                }
+                else if (Mathss.ContainsKey(equation[i]))
+                {
+                    string[] equationb = Mathss[equation[i]](equation, D, Base, i, 0);
+                    equationa += equationb[0] + " ";
+                    i += int.Parse(equationb[1]);
+                }
+                else if (double.TryParse(equation[i], out double k))
+                {
+                    equationa += k + " ";
+                }
+
+            }
+            CalculationEngine engine = new CalculationEngine();
+            return Convert.ToBoolean(engine.Calculate(equationa));
+        }
+
         public static double doMath(string[] equation, Data D, base_runner Base)
         {
             IDictionary<string, double> drict = new Dictionary<string, double>();
@@ -3077,9 +3131,9 @@ namespace jumpE_basic
                 {
                     equationa += D.referenceVar(equation[i].ToString()) + " ";
                 }
-                else if (Base.Mathss.ContainsKey(equation[i]))
+                else if (Mathss.ContainsKey(equation[i]))
                 {
-                   string[] equationb = Base.Mathss[equation[i]](equation, D, Base, i,0);
+                   string[] equationb = Mathss[equation[i]](equation, D, Base, i,0);
                     equationa += equationb[0] + " ";
                     i += int.Parse(equationb[1]);
                 }
@@ -3108,9 +3162,10 @@ namespace jumpE_basic
                 DD.SuperSet(key, args[i]);
                 i ++;
             }
-            
+            //Console.WriteLine(DD.ToString());
             base_runner Baase = new base_runner(full,DD,Base.localPath);
             return Baase.return_value;
+            
 
         }
     }

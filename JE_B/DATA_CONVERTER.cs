@@ -239,7 +239,7 @@ namespace DATA_CONVERTER
             }
             foreach(var kvp in methods)
             {
-                mama += kvp.Key + "=" + kvp.Value.get_code() + ":" + kvp.Value.get_type() + ":" + kvp.Value.get_args() + ":method|\n";
+                mama += kvp.Key + "=" + kvp.ToString() + ":method|\n";
             }
             foreach(var kvp in UNIQs)
             {
@@ -1044,6 +1044,16 @@ namespace DATA_CONVERTER
         {
             return args;
         }
+        public override String ToString()
+        {
+            string returner = "";
+            foreach(string keys in args.Keys)
+            {
+                returner += keys + " : " + args[keys] + ",";
+            }
+            returner += " : " + ty.ToString();
+            return returner;
+        }
         public static bool operator ==(Method m1, Method m2)
         {
             if(m1.code == m2.code && m1.ty == m2.ty && m1.args == m2.args)
@@ -1206,6 +1216,7 @@ namespace DATA_CONVERTER
         public override String ToString()
         {
             string returned = "[";
+            returned+= t + ",";
             for(int i = 0;i<size();i++)
             {
                 returned += stuff[i].ToString();
@@ -1215,7 +1226,17 @@ namespace DATA_CONVERTER
             return returned;
         }
 
-        
+        public static list stringtolist(string a)
+        {
+            a = a.Substring(1, a.Length - 2);
+            string[] parts = a.Split(',');
+            list l = new list(parts[0]);
+            for (int i = 1; i < parts.Length; i++)
+            {
+                l.add(parts[i]);
+            }
+            return l;
+        }
         public static bool operator ==(list l1, list l2)
         {
             if(l1.size() != l2.size())
