@@ -659,6 +659,21 @@ namespace jumpE_basic
                         {
                             Message += "!S!";
                         }
+                        else if (code[i] == "M#" && code[i + 1] == "#")
+                        {
+
+                            List<string> codess = new List<string>();
+                            for (int ll = i; ll < code.Count; ll++)
+                            {
+                                if (code[ll] == "#" && code[ll + 1] == "#M")
+                                {
+                                    i = ll + 1;
+                                    break;
+                                }
+                                codess.Add(code[ll]);
+                            }
+                            Message += doMath(codess.ToArray(), D, Base);
+                        }
                         else if (code[i] == "~|~")
                         {
                             int kk = 0;
@@ -756,6 +771,10 @@ namespace jumpE_basic
                             i++;
                             Console.Write(Message);
                             Message = "";
+                        }
+                        else
+                        {
+                            Message += code[i];
                         }
                         
 
@@ -3091,7 +3110,7 @@ namespace jumpE_basic
             string equationa = "";
             for (int i = 0; i < equation.Length; i++)
             {
-                if (equation[i] == "+" || equation[i] == "-" || equation[i] == "==" || equation[i] == "/" || equation[i] == "*" || equation[i] == "sin" || equation[i] == "cos" || equation[i] == "tan" ||
+                if (equation[i] == "+" || equation[i] == "-" || equation[i] == "==" || equation[i] == "!=" || equation[i] == "<=" || equation[i] == ">=" || equation[i] == ">" || equation [i] == "<"|| equation[i] == "/" || equation[i] == "*" || equation[i] == "sin" || equation[i] == "cos" || equation[i] == "tan" ||
                                        equation[i] == "csc" || equation[i] == "sec" || equation[i] == "%" || equation[i] == "cot" || equation[i] == "root" || equation[i] == ")" || equation[i] == "(" || equation[i] == " ")
                 {
                     equationa += equation[i] + " ";
@@ -3108,7 +3127,7 @@ namespace jumpE_basic
                 }
                 else if (double.TryParse(equation[i], out double k))
                 {
-                    equationa += k + " ";
+                    equationa += equation[i] + " ";
                 }
 
             }

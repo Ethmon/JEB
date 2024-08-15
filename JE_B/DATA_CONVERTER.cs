@@ -1216,7 +1216,6 @@ namespace DATA_CONVERTER
         public override String ToString()
         {
             string returned = "[";
-            returned+= t + ",";
             for(int i = 0;i<size();i++)
             {
                 returned += stuff[i].ToString();
