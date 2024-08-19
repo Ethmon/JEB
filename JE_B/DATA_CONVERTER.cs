@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Resources;
+using System.Runtime.Serialization.Formatters;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,8 @@ namespace DATA_CONVERTER
     }
     public partial class Data
     {
+        ISet<string> keys = new HashSet<string>();
+        public ISet<string> custtype = new HashSet<string>();
         Dictionary<string, string> strings = new Dictionary<string, string>();
         Dictionary<string, double> doubles = new Dictionary<string, double>();
         Dictionary<string, int> integers = new Dictionary<string, int>();
@@ -41,9 +44,11 @@ namespace DATA_CONVERTER
         Dictionary<string, Method> methods = new Dictionary<string, Method>();
         Dictionary<string, UNIQ> UNIQs = new Dictionary<string, UNIQ>();
         Dictionary<string, list> lists = new Dictionary<string, list>();
+        public Dictionary<string,Dictionary<string,object>> custom_types = new Dictionary<string, Dictionary<string, object>>();
+        
 
         
-        Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
+        //Dictionary<string, Dictionary<string, Object>> custom_types = new Dictionary<string, Dictionary<string, Object>>();
         public int identifier = 0;
         public int typeidentifier = 0;
         public string referenceS(string key)
@@ -57,52 +62,68 @@ namespace DATA_CONVERTER
                 throw new ArgumentException(key + " not initiallized");
             }
         }
-        public void remove(string key)
-        {
-            //remove from all dictionaries
-            if (strings.ContainsKey(key))
-            {
-                strings.Remove(key);
-            }
-            else if (doubles.ContainsKey(key))
-            {
-                doubles.Remove(key);
-            }
-            else if (integers.ContainsKey(key))
-            {
-                integers.Remove(key);
-            }
-            else if (sheets.ContainsKey(key))
-            {
-                sheets.Remove(key);
-            }
-            else if (custom_types.ContainsKey(key))
-            {
-                custom_types.Remove(key);
-            }
-            else if (lines.ContainsKey(key))
-            {
-                lines.Remove(key);
-            }
-            else if (functions.ContainsKey(key))
-            {
-                functions.Remove(key);
-            }
-            else if (files.ContainsKey(key))
-            {
-                files.Remove(key);
-            }
-            else if (methods.ContainsKey(key))
-            {
-                methods.Remove(key);
-            }
-            else if (UNIQs.ContainsKey(key))
-            {
-                UNIQs.Remove(key);
-            }
+        //public void remove(string key)
+        //{
+        //    //remove from all dictionaries
+        //    if (strings.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        strings.Remove(key);
+        //    }
+        //    else if (doubles.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        doubles.Remove(key);
+        //    }
+        //    else if (integers.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        integers.Remove(key);
+        //    }
+        //    else if (sheets.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        sheets.Remove(key);
+        //    }
+        //    else if (custom_types.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        custom_types.Remove(key);
+        //    }
+        //    else if (lines.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        lines.Remove(key);
+        //    }
+        //    else if (functions.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        functions.Remove(key);
+        //    }
+        //    else if (files.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        files.Remove(key);
+        //    }
+        //    else if (methods.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        methods.Remove(key);
+        //    }
+        //    else if (UNIQs.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        UNIQs.Remove(key);
+        //    }
+        //    else if (lists.ContainsKey(key))
+        //    {
+        //        keys.Remove(key);
+        //        lists.Remove(key);
+        //    }
+        //    //else if()
             
 
-        }
+        //}
         public Data Copy()
         {
             Data d = new Data();
@@ -125,7 +146,7 @@ namespace DATA_CONVERTER
             string stringsData = DictionaryToString(strings,"string");
             string doublesData = DictionaryToString(doubles,"double");
             string integersData = DictionaryToString(integers,"int");
-            string customData = DictionaryToString(custom_types,"custom");
+            //string customData = DictionaryToString(custom_types,"custom");
             string linesData = DictionaryToString(lines,"line");
             string functionsData = DictionaryToString(functions,"function");
             string filesData = DictionaryToString(files,"file");
@@ -135,7 +156,7 @@ namespace DATA_CONVERTER
                 sheetsData += kvp.Key + "=" + kvp.Value.identifier + Environment.NewLine;
                 kvp.Value.SaveToFile(filePath + "_" + kvp.Key);
             }
-            File.WriteAllText(filePath, stringsData + Environment.NewLine + doublesData + Environment.NewLine + integersData + Environment.NewLine + customData + Environment.NewLine + linesData + Environment.NewLine + functionsData + Environment.NewLine + filesData + Environment.NewLine + sheetsData);
+            File.WriteAllText(filePath, stringsData + Environment.NewLine + doublesData + Environment.NewLine + integersData + Environment.NewLine + Environment.NewLine + linesData + Environment.NewLine + functionsData + Environment.NewLine + filesData + Environment.NewLine + sheetsData);
         }
         public void save_specific_var(string key, string path)
         {
@@ -192,7 +213,7 @@ namespace DATA_CONVERTER
             StringToDictionary(liness[0], strings);
             StringToDictionary(liness[1], doubles);
             StringToDictionary(liness[2], integers);
-            StringToDictionary(liness[3], custom_types);
+            //StringToDictionary(liness[3], custom_types);
             StringToDictionary(liness[4], lines);
             StringToDictionary(liness[5], functions);
             StringToDictionary(liness[6], files);
@@ -347,11 +368,12 @@ namespace DATA_CONVERTER
         }
         public bool isvar(string key)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key)||UNIQs.ContainsKey(key)||lists.ContainsKey(key))
-            {
-                return true;
-            }
-            return false;
+            return keys.Contains(key);
+            //if (doubles.ContainsKey(key) || integers.ContainsKey(key) || strings.ContainsKey(key) || sheets.ContainsKey(key)||custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key)|| methods.ContainsKey(key)||UNIQs.ContainsKey(key)||lists.ContainsKey(key))
+            //{
+            //    return true;
+            //}
+            //return false;
         }
         public bool inint(string key)
         {
@@ -447,10 +469,6 @@ namespace DATA_CONVERTER
             {
                 return sheets[key];
             }
-            else if (custom_types.ContainsKey(key))
-            {
-                return custom_types[key];
-            }
             else if (lines.ContainsKey(key))
             {
                 return lines[key];
@@ -471,6 +489,14 @@ namespace DATA_CONVERTER
             {
                 return UNIQs[key];
             }
+            else if (custtypeofkey(key) != "Null")
+            {
+                return custom_types[custtypeofkey(key)][key];
+            }
+            else if (methods.ContainsKey(key))
+            {
+                return methods[key];
+            }
             else
             {
                 throw new ArgumentException(key + " not initiallized");
@@ -479,11 +505,11 @@ namespace DATA_CONVERTER
         }
         public void setS(string key, string data)
         {
-            if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            //if (doubles.ContainsKey(key) || integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || lines.ContainsKey(key) || functions.ContainsKey(key) || files.ContainsKey(key))
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
+            //else
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -491,9 +517,9 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (strings.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        strings.Remove(key);
+                        SuperRemove(key);
                     }
                     strings.Add(key, data);
                 }
@@ -501,7 +527,7 @@ namespace DATA_CONVERTER
         }
         public void setMethod(string key, string[] code, Type t, Dictionary<string, Object> args)
         {
-            if ((isMethod(key) && isvar(key)) || !isvar(key))
+            //if ((isMethod(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -509,17 +535,17 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (methods.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        methods.Remove(key);
+                        SuperRemove(key);
                     }
                     methods.Add(key, new Method(code, t, args));
                 }
             }
-            else
-            {
-                Console.WriteLine("variable set to other type");
-            }
+            //else
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public bool islist(string key)
         {
@@ -531,7 +557,7 @@ namespace DATA_CONVERTER
         }
         public void setlist(string key, list data)
         {
-            if ((isvar(key) && islist(key)) || !isvar(key))
+            //if ((isvar(key) && islist(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -539,25 +565,25 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (lists.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        lists.Remove(key);
+                        SuperRemove(key);
                     }
                     lists.Add(key, data);
                 }
             }
-            else
-            {
-                Console.WriteLine("variable set to other type");
-            }
+            //else
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public void setLine(string key, Line data)
         {
-            if (doubles.ContainsKey(key) || strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || files.ContainsKey(key) || functions.ContainsKey(key))
-            {
-                Console.WriteLine("variable set to other type");
-            }
-            else
+            //if (doubles.ContainsKey(key) || strings.ContainsKey(key)|| integers.ContainsKey(key) || sheets.ContainsKey(key) || custom_types.ContainsKey(key) || files.ContainsKey(key) || functions.ContainsKey(key))
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
+            //else
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -565,9 +591,9 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (lines.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        lines.Remove(key);
+                        SuperRemove(key);
                     }
                     lines.Add(key, data);
                 }
@@ -575,7 +601,7 @@ namespace DATA_CONVERTER
         }
         public void setFunction(string key, Function data)
         {
-            if ((isFunction(key) && isvar(key)) || !isvar(key))
+            //if ((isFunction(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -583,22 +609,22 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (functions.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        functions.Remove(key);
+                        SuperRemove(key);
                     }
                     functions.Add(key, data);
                 }
             }
-            else
-            {
+            //else
+            //{
                 
-                Console.WriteLine("variable set to other type");
-            }
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public void setFile(string key, file data)
         {
-            if((isFile(key)&&isvar(key))||!isvar(key))
+            //if((isFile(key)&&isvar(key))||!isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -606,23 +632,23 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (files.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        files.Remove(key);
+                        SuperRemove(key);
                     }
                     files.Add(key, data);
                 }
             }
-            else
-            {
+            //else
+            //{
                 
-                Console.WriteLine("variable set to other type");
-            }
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
 
         public void setD(string key, double data)
         {
-            if ((indouble(key) && isvar(key)) || !isvar(key))
+            //if ((indouble(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -630,22 +656,22 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (doubles.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        doubles.Remove(key);
+                        SuperRemove(key);
                     }
                     doubles.Add(key, data);
                 }
                 
             }
-            else
-            {
-                Console.WriteLine("variable set to other type");
-            }
+            //else
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public void setUNIQ(string key,UNIQ data)
         {
-            if ((isUNIQ(key) && isvar(key)) || !isvar(key))
+            //if ((isUNIQ(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -653,18 +679,18 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (UNIQs.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        UNIQs.Remove(key);
+                        SuperRemove(key);
                     }
                     UNIQs.Add(key, data);
                 }
                 
             }
-            else
-            {
-                Console.WriteLine("variable set to other type");
-            }
+            //else
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public bool isUNIQ(string key)
         {
@@ -674,13 +700,47 @@ namespace DATA_CONVERTER
             }
             return false;
         }
-        public void setCustom(string key, Dictionary<string, Object> data)
+        public string custtypeofkey(string key)
         {
-            if (isvar(key))
+            string type = "Null";
+            // retruns a string of they type of the variable assigned to the key
+            if (keys.Contains(key))
             {
-                Console.WriteLine("variable set to other type");
+                foreach(Dictionary<string,object> dict in custom_types.Values)
+                {
+                    if (dict.ContainsKey(key))
+                    {
+                        type = key;
+                    }
+                }
+            }
+            return type;
+        }
+        public object refrenceCustom(string t, string key)
+        {
+            if (custom_types.ContainsKey(t))
+            {
+                if (custom_types[t].ContainsKey(key))
+                {
+                    return custom_types[t][key];
+                }
+                else
+                {
+                    throw new ArgumentException(key + " not initiallized");
+                }
             }
             else
+            {
+                throw new ArgumentException(t + " not initiallized");
+            }
+        }
+        public void setCustom(string key, object data)
+        {
+            //if (keys.Contains(key))
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
+            //else
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -688,18 +748,21 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (custom_types.ContainsKey(key))
+                    if (custtype.Contains(key))
                     {
-                        custom_types.Remove(key);
+                        if (keys.Contains(key))
+                        {
+                            SuperRemove(key);
+                        }
+                        custom_types[key].Add(key, data);
                     }
-                    custom_types.Add(key, data);
                 }
             }
         }
 
         public void setsheet(string key, Data data)
         {
-            if ((issheet(key) && isvar(key)) || !isvar(key))
+            //if ((issheet(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -707,22 +770,22 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (sheets.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        sheets.Remove(key);
+                        SuperRemove(key);
                     }
                     sheets.Add(key, data);
                 }
             }
-            else
-            {
+            //else
+            //{
                 
-                Console.WriteLine("variable set to other type");
-            }
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
         public void setI(string key, int data)
         {
-            if ((inint(key) && isvar(key)) || !isvar(key))
+            //if ((inint(key) && isvar(key)) || !isvar(key))
             {
                 if (Double.TryParse(key, out _))
                 {
@@ -730,21 +793,81 @@ namespace DATA_CONVERTER
                 }
                 else
                 {
-                    if (integers.ContainsKey(key))
+                    if (keys.Contains(key))
                     {
-                        integers.Remove(key);
+                        SuperRemove(key);
                     }
                     integers.Add(key, data);
                 }
             }
-            else
-            {
-                Console.WriteLine("variable set to other type");
-            }
+            //else
+            //{
+            //    Console.WriteLine("variable set to other type");
+            //}
         }
+        public void SuperRemove(string key)
+        {
+            if (strings.ContainsKey(key))
+            {
+                strings.Remove(key);
+                keys.Remove(key);
+            }
+            else if (integers.ContainsKey(key))
+            {
+                integers.Remove(key);
+                keys.Remove(key);
+            }
+            else if (doubles.ContainsKey(key))
+            {
+                doubles.Remove(key);
+                keys.Remove(key);
+            }
+            else if (sheets.ContainsKey(key))
+            {
+                sheets.Remove(key);
+                keys.Remove(key);
+            }
+            else if (lines.ContainsKey(key))
+            {
+                lines.Remove(key);
+                keys.Remove(key);
+            }
+            else if (functions.ContainsKey(key))
+            {
+                functions.Remove(key);
+                keys.Remove(key);
+            }
+            else if (files.ContainsKey(key))
+            {
+                files.Remove(key);
+                keys.Remove(key);
+            }
+            else if (methods.ContainsKey(key))
+            {
+                methods.Remove(key);
+                keys.Remove(key);
+            }
+            else if (UNIQs.ContainsKey(key))
+            {
+                UNIQs.Remove(key);
+                keys.Remove(key);
+            }
+            else if (lists.ContainsKey(key))
+            {
+                lists.Remove(key);
+                keys.Remove(key);
+            }
+            else if(custtypeofkey(key)!= "Null")
+            {
+                custom_types[custtypeofkey(key)].Remove(key);
+                keys.Remove(key);
+            }
+            
+        }
+
         public void SuperSet(string key, Object data)
         {
-            remove(key);
+            SuperRemove(key);
             if (data is string)
             {
                 setS(key, (string)data);
@@ -812,8 +935,16 @@ namespace DATA_CONVERTER
 
 
     }
-    public partial class Line
+    public interface CustTypeName
     {
+        string name();
+    }
+    public partial class Line : CustTypeName
+    {
+        public string name()
+        {
+            return "Line";
+        }
         private int line_number;
         private string line_string;
         public string file_path;

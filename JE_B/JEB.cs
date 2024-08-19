@@ -411,6 +411,7 @@ namespace jumpE_basic
         public class CommandRegistry
         {
             public Dictionary<string, DATA_CONVERTER.command_centralls> commands = new Dictionary<string, DATA_CONVERTER.command_centralls>();
+            public Dictionary<string, Func<List<string>, Data, base_runner,bool>> seters = new Dictionary<string, Func<List<string>, Data, base_runner,bool>>();
             public CommandRegistry()
             {
                 print print = new print();//prints to console, can use variables and strings by putting them in quotes(must be seperated by spaces)
@@ -868,7 +869,7 @@ namespace jumpE_basic
                 }*/
                 if (D.isvar(code[1]))
                 {
-                    D.remove(code[1]);
+                    D.SuperRemove(code[1]);
                 }
                 //} catch { Console.WriteLine("Error: 4, Unable to Free, Line"+Base.position); }
             }
@@ -921,22 +922,7 @@ namespace jumpE_basic
                 {
                     if (D.isvar(code[i]))
                     {
-                        if (D.inint(code[i]))
-                        {
-                            datas.setI(code[i + 1], D.referenceI(code[i]));
-                        }
-                        else if (D.indouble(code[i]))
-                        {
-                            datas.setD(code[i + 1], D.referenceD(code[i]));
-                        }
-                        else if (D.instring(code[i]))
-                        {
-                            datas.setS(code[i + 1], D.referenceS(code[i]));
-                        }
-                        else if (D.issheet(code[i]))
-                        {
-                            datas.setsheet(code[i + 1], D.referenceSheet(code[i]));
-                        }
+                        datas.SuperSet(code[i + 1], D.referenceVar(code[i]));
                     }
                     if (int.TryParse(code[i], out int ad))
                     {
@@ -1014,26 +1000,8 @@ namespace jumpE_basic
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (Base.datas[Base.datas.Count - 2].inint(code[1]))
-                {
-                    D.setI(code[1], Base.datas[Base.datas.Count - 2].referenceI(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].indouble(code[1]))
-                {
-                    D.setD(code[1], Base.datas[Base.datas.Count - 2].referenceD(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].instring(code[1]))
-                {
-                    D.setS(code[1], Base.datas[Base.datas.Count - 2].referenceS(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
-                {
-                    D.setsheet(code[1], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].islist(code[1]))
-                {
-                    D.setlist(code[1], (list)Base.datas[Base.datas.Count - 2].referenceVar(code[1]));
-                }
+               
+                D.SuperSet(code[1], Base.datas[Base.datas.Count - 2].referenceVar(code[1]));
                 //adding lines functions and files
 
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
@@ -1043,22 +1011,7 @@ namespace jumpE_basic
         {
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (Base.datas[Base.datas.Count - 2].inint(code[1]))
-                {
-                    D.setI(code[2], Base.datas[Base.datas.Count - 2].referenceI(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].indouble(code[1]))
-                {
-                    D.setD(code[2], Base.datas[Base.datas.Count - 2].referenceD(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].instring(code[1]))
-                {
-                    D.setS(code[2], Base.datas[Base.datas.Count - 2].referenceS(code[1]));
-                }
-                else if (Base.datas[Base.datas.Count - 2].issheet(code[1]))
-                {
-                    D.setsheet(code[2], Base.datas[Base.datas.Count - 2].referenceSheet(code[1]));
-                }
+                D.SuperSet(code[2], Base.datas[Base.datas.Count - 2].referenceVar(code[1]));
                 //else { Console.WriteLine("Error: 7, unable to bring, Line "+Base.position); }
             }
         }
@@ -1082,26 +1035,7 @@ namespace jumpE_basic
             //pre_defined_variable f = new pre_defined_variable();
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (D.inint(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setI(code[1], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
-                }
-                else if (D.indouble(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setD(code[1], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
-                }
-                else if (D.instring(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setS(code[1], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
-                }
-                else if (D.issheet(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1]));
-                }
-                else if (D.issheet(code[1] + "#"))
-                {
-                    Base.datas[Base.datas.Count() - 2].setsheet(code[1], D.referenceSheet(code[1] + "#"));
-                }
+                Base.datas[Base.datas.Count() - 2].SuperSet(code[1], D.referenceVar(code[1]));
                 //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
 
@@ -1112,22 +1046,7 @@ namespace jumpE_basic
             //pre_defined_variable f = new pre_defined_variable();
             public override void Execute(List<string> code, Data D, base_runner Base)
             {
-                if (D.inint(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setI(code[2], D.referenceI(code[1])); //Base.commandRegistry.add_command(code[1], f); 
-                }
-                else if (D.indouble(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setD(code[2], D.referenceD(code[1])); //Base.commandRegistry.add_command(code[1], f); 
-                }
-                else if (D.instring(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setS(code[2], D.referenceS(code[1])); //Base.commandRegistry.add_command(code[1], f);                                                                                                          
-                }
-                else if (D.issheet(code[1]))
-                {
-                    Base.datas[Base.datas.Count() - 2].setsheet(code[2], D.referenceSheet(code[1]));
-                }
+                Base.datas[Base.datas.Count() - 2].SuperSet(code[2], D.referenceVar(code[1]));
                 //else { Console.WriteLine("Error: 8, unable to push, Line "+Base.position); }
                 //else if (D.isvar(code[1])) { Base.datas[Base.datas.Count - 1].se(code[1], D.referenceI(code[1])); }
 
@@ -1573,7 +1492,7 @@ namespace jumpE_basic
 {{ 
     public class {className} : command_centrall
     {{ 
-        public override void Execute(List<string> code, Data D)
+        public override void Execute(List<string> code, Data D, base_runner Base)
         {{
             {fileContent}
         }}
@@ -2680,6 +2599,13 @@ namespace jumpE_basic
                                 catch
                                 {
                                     throw new Exception("Initialization error " + Base.position);
+                                }
+                                break;
+                            default:
+                                string typess = D.custtypeofkey(code[0]);
+                                if(typess!="Null")
+                                {
+                                    Base.commandRegistry.seters[typess](code, D, Base);
                                 }
                                 break;
 
