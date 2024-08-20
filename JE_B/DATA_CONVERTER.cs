@@ -522,6 +522,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     strings.Add(key, data);
+                    keys.Add(key);
                 }
             }
         }
@@ -540,6 +541,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     methods.Add(key, new Method(code, t, args));
+                    keys.Add(key);
                 }
             }
             //else
@@ -570,6 +572,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     lists.Add(key, data);
+                    keys.Add(key);
                 }
             }
             //else
@@ -596,6 +599,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     lines.Add(key, data);
+                    keys.Add(key);
                 }
             }
         }
@@ -614,6 +618,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     functions.Add(key, data);
+                    keys.Add(key);
                 }
             }
             //else
@@ -637,6 +642,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     files.Add(key, data);
+                    keys.Add(key);
                 }
             }
             //else
@@ -661,6 +667,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     doubles.Add(key, data);
+                    keys.Add(key);
                 }
                 
             }
@@ -684,6 +691,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     UNIQs.Add(key, data);
+                    keys.Add(key);
                 }
                 
             }
@@ -755,6 +763,8 @@ namespace DATA_CONVERTER
                             SuperRemove(key);
                         }
                         custom_types[key].Add(key, data);
+                        keys.Add(key);
+                        
                     }
                 }
             }
@@ -775,6 +785,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     sheets.Add(key, data);
+                    keys.Add(key);
                 }
             }
             //else
@@ -798,6 +809,7 @@ namespace DATA_CONVERTER
                         SuperRemove(key);
                     }
                     integers.Add(key, data);
+                    keys.Add(key);
                 }
             }
             //else
@@ -816,6 +828,7 @@ namespace DATA_CONVERTER
             {
                 integers.Remove(key);
                 keys.Remove(key);
+                //Console.WriteLine("removed");
             }
             else if (doubles.ContainsKey(key))
             {
@@ -908,6 +921,7 @@ namespace DATA_CONVERTER
             {
                 setUNIQ(key, ((UNIQ)data));
             }
+
         }
         public Type getType(string key)
         {
